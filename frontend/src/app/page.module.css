@@ -1,0 +1,16 @@
+.landingPage{
+    width: 100%;
+    padding: auto;
+}
+.landingPage a{
+    cursor: pointer;
+}
+.bodyContainer{
+    width: calc(100%-20px);
+    padding: 10px;
+    margin: 10px;
+    background-color: rgba(81, 29, 23, 0.605);
+    /* border: 1px solid red; */
+    border-radius: 16px;
+    /* box-shadow: ; */
+}

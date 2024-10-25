@@ -1,0 +1,11 @@
+.hero {
+    height: 100vh;
+    background: url('/asset/landingPage/Section.svg') no-repeat center center;  
+    background-size: cover;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  

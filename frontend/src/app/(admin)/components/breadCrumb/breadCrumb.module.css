@@ -1,0 +1,17 @@
+.breadcrumb {
+    list-style: none;
+    display: flex;
+    padding: 20px 0;
+}
+.breadcrumbItem {
+    cursor: pointer;
+    margin-right: 0.5rem;
+}
+.breadcrumbItem:last-child{
+    color: rgba(3, 67, 163, 0.708);
+    /* color: rgba(70, 16, 16, 0.756); */
+}
+.breadcrumb i{
+    width: 24px;
+    height: 24px;
+}

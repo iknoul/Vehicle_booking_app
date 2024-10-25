@@ -1,0 +1,11 @@
+.carContainer{
+    display: flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0 !important;
+    width: 100%;
+    padding: 1%;
+    overflow-x: auto !important;
+    justify-content: center;
+    gap: 10px;
+    background-color: rgba(255, 255, 255, 0.);
+}

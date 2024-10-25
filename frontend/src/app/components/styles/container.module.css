@@ -1,0 +1,43 @@
+.container{
+    width: 50%; 
+    display: flex;
+    flex-direction: column;
+}
+
+  .title {
+    color: white;
+    font-size: 40px;
+    font-weight: bold;
+    text-transform: uppercase;
+  }
+  
+  .title span {
+    color: rgba(208, 180, 42, 0.947);
+
+  }
+  
+  .buttons {
+    margin-top: 2.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .button {
+    width: fit-content;
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px solid white;
+    color: white;
+    padding: 0.5rem 1rem;
+    margin: 0 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .button:hover {
+    background-color: rgba(255, 255, 255, 0.224);
+    border: none;
+    color: black;
+  }
+  

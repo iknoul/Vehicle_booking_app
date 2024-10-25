@@ -1,0 +1,51 @@
+.sideBar{
+    min-height: 100vh;
+    background-color: rgba(3, 67, 163, 0.708);
+    /* background-color: rgba(70, 16, 16, 0.756); */
+}
+.sideBar .sideBarHead i{
+    transform: rotate(180deg);
+}
+.sideBarMax{
+    width: 250px;
+}
+.sideBarMax .sideBarHead i{
+    transform: rotate(0deg) !important;
+
+}
+.sideBarHead{
+    display: flex;
+    padding: 10px;
+    justify-content: end;
+    width: 100%;
+    margin-bottom: 10px;
+}
+.sideBarHead i{
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+}
+.sideBarHead i:hover, .active{
+    background-color: rgba(3, 67, 163, 0.297);
+}
+.sideBarItem{
+    cursor: pointer;
+    width: 100%;
+    padding: 20px;
+    justify-content: left;
+    align-items: center;
+    display: flex;
+    gap: 10px;
+}
+.sideBarItem:hover{
+    background-color: rgba(3, 67, 163, 0.459);
+}
+.sideBarItem i{
+    width: 34px;
+}
+.sideBarIte p{
+    width: 178px;
+}

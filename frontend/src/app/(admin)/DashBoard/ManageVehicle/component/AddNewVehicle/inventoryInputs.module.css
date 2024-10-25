@@ -1,0 +1,54 @@
+.imagePreviewContainer{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.imagePreviewContainer img{
+    object-fit: cover;
+}
+.imagePreviewContainer input{
+    display: none;
+}
+.uploadBox {
+    border: 2px dashed #d9d9d9;
+    border-radius: 4px;
+    padding: 16px;
+    text-align: center;
+    cursor: pointer;
+    margin-bottom: 16px;
+  }
+  .uploadBox input{
+    display: none !important;
+  }
+
+  .uploadLabel {
+    cursor: pointer;
+  }
+
+
+  .imagePreview {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    cursor: pointer;
+  }
+
+  .removeIcon {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    background: rgba(255, 255, 255, 0.7);
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+  .removeIcon:hover {
+    background: rgba(255, 0, 0, 0.7);
+  }
+
+  .removeIcon svg {
+    width: 16px;
+    height: 16px;
+    color: #ff4d4f;
+  }

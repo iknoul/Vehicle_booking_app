@@ -1,0 +1,65 @@
+.cta {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 2rem;
+  }
+  .ctaItem{
+    width: 100%;
+    max-width: 900px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+  }
+  
+  .ctaItem h2 {
+    color: rgba(68, 118, 102, 0.6);
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  
+  .ctaItem h3 {
+    font-size: 18px;
+    line-height: 24px;
+    font-weight: 600;
+  }
+
+  .ctaContent{
+    width: fit-content;
+    max-width: 450px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .ctaItem img {
+    max-width: 100%;
+    height: auto;
+  }
+  .ctaImage{
+    width: 60%;
+  }
+  .ctaImage2{
+    width: 40%;
+  }
+  .ctaContent span{
+    font-weight: bold;
+
+  }
+  .ctaContent p {
+    font-size: 14px;
+    line-height: 24px;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .ctaContent a{
+    width: fit-content;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    color: black;
+    border-bottom: 2px solid black;
+  }
+  

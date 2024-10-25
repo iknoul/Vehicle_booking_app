@@ -1,0 +1,17 @@
+.bookingPage{
+    width: 100%;
+    min-height: 90vh;
+    display: flex;
+    align-items: center;
+    background-color: rgba(208, 180, 42, 0.947);
+}
+.bookInputHead{
+    /* border-bottom: 1px solid rgb(255, 255, 255); */
+    border-bottom: 1px solid black;
+}
+.threeDImageContainer{
+    width: 65%;
+    height: 80%;
+    padding: 10px;
+    /* border: 1px solid red; */
+}

@@ -1,0 +1,12 @@
+.popularBrands{
+    width: 100%;
+    padding: 20px 5px;
+    margin: 20px 0;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+}
+.popularBrands img{
+    width: 64px;
+    height: 64px;
+}

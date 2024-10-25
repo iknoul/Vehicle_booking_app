@@ -1,0 +1,60 @@
+/* styles/UserProfile.module.css */
+
+.container {
+    /* width: 100%;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column; */
+    /* align-items: center; */
+    /* gap: 10px;
+    padding: 20px; */
+  }
+  
+  .navBar{
+    /* width: 100%;
+    padding: 0;
+    border-bottom: 1px solid black;
+    background-color: rgba(70, 16, 16, 0.575); */
+    /* background-color: #d2a9168a; */
+  }
+  /* .navBar span{
+    padding: 8px;
+    color:  white;
+    border-bottom: 2px solid rgb(252, 252, 252);
+  } */
+
+  .container {
+    width: 100%;
+    min-height: 100vh;
+    display: flex;
+    /* align-items: center; */
+    gap: 10px;
+    padding: 20px;
+    padding-top: 56px;
+    background-color: rgba(70, 16, 16, 0.756);
+  }
+  .noData{
+    justify-content: center;
+    background-color: white;
+    /* align-items: center; */
+  }
+  .pages{
+    width: 100%;
+    display: flex;
+    border-radius: 16px;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+    height: calc(100vh - 76px);
+    min-height: calc(100vh - 76px);
+    background-color: rgba(240, 248, 255, 0.92);
+  }
+  .head{
+    width: 100%;
+  }
+  .head h3{
+      text-align: center;
+      width: 100%;
+      text-align:  center;
+  }
+  

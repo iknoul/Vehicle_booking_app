@@ -1,0 +1,28 @@
+.navBar{
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+    align-items: left;
+    justify-content: space-evenly;
+}
+.navBar .active{
+    border-bottom: 2px solid white;
+}
+.navigation{
+    display: flex;
+}
+.navBar button{
+    border: none;
+    outline: none;
+    background-color: none;
+}
+.navigationLinks {
+    cursor: pointer;
+    text-align: center;
+    padding: 0 8px;
+    border-bottom: 1px solid black;
+}
+.activeItem{
+    border-bottom: 2px solid rgba(3, 67, 163, 0.708);
+    /* border-bottom: 2px solid rgba(70, 16, 16, 0.756); */
+}

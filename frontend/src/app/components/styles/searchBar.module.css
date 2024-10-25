@@ -1,0 +1,46 @@
+.searchBar{
+    margin: 20px;
+    width: calc(100% - 40px);
+    height: 80px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    padding: 10px;
+    gap: 10px;
+    /* border-bottom: 1px solid rgba(208, 180, 42, 0.947); */
+    border: 1px solid #4b4136;
+    border-radius: 16px;
+    /* background-color: rgba(255, 255, 255, 0.776); */
+    background-color: rgba(240, 248, 255, 0.6);
+
+}
+.input{
+  width: 40%;
+}
+.datePickContiner{
+  width: 40%;
+  display: flex;
+  flex-direction: row; 
+  justify-content:center; 
+  align-items:center;
+  gap: 5px;
+}
+ .datePicker {
+    width: 50%; /* Adjust width for input and other elements */
+    /* background-color: rgba(193, 180, 1, 0.45); */
+  }
+  .button{
+    width: 80px;
+  }
+  .filter{
+    cursor: pointer;
+    padding: 3px 5px;
+    color: red;
+  }
+  .filter:hover{
+    /* background-color: rgb(181, 186, 191); */
+    color: #939291c6;
+  }
+  .filtered{
+    color:  green;
+  }

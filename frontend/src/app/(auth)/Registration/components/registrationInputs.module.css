@@ -1,0 +1,47 @@
+.registrationInputs{
+    margin-top: 50px;
+    height: fit-content;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    background-color: rgba(255, 255, 255, 0.849)
+}
+
+.registrationInputs {
+    width: 100%;
+    max-width: 450px;
+    /* max-width: 400px; Limit the width of the form */
+    margin: 0 auto;   /* Center the form horizontally */
+    padding: 20px;    /* Add some padding around the form */
+    border-radius: 10px; /* Rounded corners for a modern look */
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+  }
+  
+  .registrationInputs h1 {
+    text-align: center; /* Center the title */
+    font-weight: 400;
+    font-size: 24px;    /* Adjust the size of the title */
+    margin-bottom: 20px; /* Space between title and form */
+    color: #333;        /* Dark color for the heading */
+  }
+  .form{
+    width: 400px;
+    font-weight: 350;
+  
+  }
+  .form input{
+    font-size: 14px;
+    font-weight: 350;
+  }
+  .buttonContainer{
+    width: 100%;
+    display: flex;
+    justify-content: end;
+  }
+   .err{
+    font-size: 12px;
+    color: rgba(193, 19, 19, 0.509);
+  }
+  
+  
