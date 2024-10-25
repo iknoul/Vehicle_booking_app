@@ -22,6 +22,7 @@
     "react": "^18",
     "react-dom": "^18",
     "react-hook-form": "^7.53.0",
+    "recharts": "^2.13.0",
     "three": "^0.169.0"
   },
   "devDependencies": {

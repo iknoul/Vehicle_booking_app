@@ -7,14 +7,24 @@ export const FETCH_PERIODS_QUERY = gql`
             status
             startDate
             endDate
+            vehicleType
+            vehicleModelName
+            vehicleManufacture
             uniqueVehicle {
                 id
                 vehicle {
                     name
-                    model
-                    manufacture
                 }
             }
         }
     }
+`;
+export const FETCH_PERIOD_BY_DATE_QUERY = gql`
+  query PeroidByDate {
+    PeroidByDate {
+      createdDate
+      PeriodCount
+      carModel
+    }
+  }
 `;

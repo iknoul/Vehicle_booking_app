@@ -97,34 +97,6 @@ const isDateRangeAvailable = async (startDate, endDate, vehicleId, transaction) 
 const getPeriodByUser = async (userId) => {
 
     try {
-         // Find all Periods associated with the given userId
-        //  const periods = await Period.findAll({
-        //     where: { userId },
-        //     include: [
-        //         {
-        //             model: uniqueVehicle,
-        //             as: 'uniqueVehicle',
-        //             include: [
-        //                 {
-        //                     model: Vehicle,
-        //                     as: 'vehicle',
-        //                     attributes: ['id', 'name', 'modelId'], // Include modelId to debug if necessary
-        //                     include: [
-        //                         {
-        //                             model: ModelRegistry, // Include the model data
-        //                             as: 'vehicleModel', // Alias used in the association
-        //                             // attributes: ['type', 'model', 'manufacture'], // Specify the attributes you want
-        //                             attributes: {
-        //                                 include: ['type', 'model', 'manufacture'], // Flatten attributes directly here
-        //                             },
-        //                         },
-        //                     ],
-        //                     raw: true
-        //                 },
-        //             ],
-        //         },
-        //     ],
-        // });
         const periods = await Period.findAll({
             where: { userId },
             include: [
@@ -135,34 +107,13 @@ const getPeriodByUser = async (userId) => {
                         {
                             model: Vehicle,
                             as: 'vehicle',
-                            attributes: [
-                                'id',
-                                'name',
-                                [Sequelize.col('vehicleModel.model'), 'model'], // Use the correct alias path
-                                [Sequelize.col('vehicleModel.manufacture'), 'manufacture'], // Use the correct alias path
-                                [Sequelize.col('vehicleModel.type'), 'type'], // Use the correct alias path
-                            ],
                             include: [
                                 {
                                     model: ModelRegistry,
-                                    as: 'vehicleModel', // Ensure this alias matches the one used in the association
-                                    attributes: ['model', 'type', 'manufacture'], // Do not include the whole ModelRegistry object
+                                    as: 'vehicleModel',
                                 },
                             ],
                         },
-                        
-                                // {
-                                //     model: Vehicle,
-                                //     as: 'vehicle',
-                                //     include: [
-                                //         {
-                                //             model: ModelRegistry,
-                                //             as: 'vehicleModel',
-                                //             attributes: ['type', 'model'],
-                                //         },
-                                //     ],
-                                // },
-                        
                     ],
                 },
             ],
@@ -174,8 +125,33 @@ const getPeriodByUser = async (userId) => {
                 message: 'No periods found for this user',
             });
         }
-        console.log(periods[0].dataValues.uniqueVehicle.vehicle, 'here the periods')
-        return periods
+        
+        // Manually map the nested fields to the top-level fields
+        const formattedPeriods = periods.map(period => {
+            const vehicle = period.uniqueVehicle?.vehicle;
+            const vehicleModel = vehicle?.vehicleModel;
+        
+            return {
+                ...period.dataValues,
+                vehicleType: vehicle?.vehicleType || null,
+                vehicleModelName: vehicleModel?.model || null, // Assuming `name` is the field for model name
+                vehicleManufacture: vehicleModel?.manufacture || null, // Assuming `manufacturer` is the field for manufacture name
+                uniqueVehicle: {
+                    ...period.uniqueVehicle?.dataValues,
+                    vehicle: {
+                        ...vehicle?.dataValues,
+                    },
+                },
+            };
+        });
+        
+        // return formattedPeriods;
+        
+        
+
+        
+        console.log(typeof formattedPeriods, 'here the periods')
+        return formattedPeriods
 
     } catch (error) {
         console.error('Error fetching user periods:', error.message);
@@ -248,6 +224,39 @@ const findAvailableUniqueVehicleWithLowestCount = async (startDate, endDate, veh
         throw new Error('Failed to find an available unique vehicle with the lowest period count');
     }
 };
+const updatePeriodStatusToInHand = async () => {
+    try {
+        // Get the current date
+        const currentDate = new Date();
+
+        // Find all periods where the start date has arrived or passed, and the status is still "Booked"
+        const periodsToUpdate = await Period.findAll({
+            where: {
+                startDate: {
+                    [Sequelize.Op.lte]: currentDate, // Check if start date is less than or equal to the current date
+                },
+                status: 'Booked', // Only update periods that are currently "Booked"
+            },
+        });
+
+        // If no periods found, return without updating
+        if (periodsToUpdate.length === 0) {
+            console.log('No periods found to update');
+            return;
+        }
+
+        // Update each period's status to "In Hand"
+        for (const period of periodsToUpdate) {
+            await period.update({ status: 'In Hand' });
+        }
+
+        console.log(`${periodsToUpdate.length} periods updated to "In Hand"`);
+
+    } catch (error) {
+        console.error('Error updating periods to "In Hand":', error);
+        throw new Error('Failed to update period status');
+    }
+};
 
 const getPeriodById = async (id) => {
     return await Period.findByPk(id);
@@ -293,14 +302,73 @@ const deletePeriod = async (id) => {
         throw new Error('Period not found');
     });
 };
+async function getPeriodCountByDateAndVehicleModel() {
+    try {
+        const results = await Period.findAll({
+            attributes: [
+                [fn('DATE', col('Period.createdAt')), 'createdDate'], // Specify the Period table's createdAt
+                [fn('COUNT', col('Period.id')), 'PeriodCount'], // Count the number of Periods
+                [col('uniqueVehicle->vehicle.name'), 'carModel'], // Vehicle name
+                col('uniqueVehicle.id') // Include uniqueVehicle id
+                // Optionally include additional fields you need to return
+            ],
+            include: [
+                {
+                    model: uniqueVehicle,
+                    as: 'uniqueVehicle', // Ensure this matches your model definition
+                    include: [
+                        {
+                            model: Vehicle,
+                            as: 'vehicle', // Ensure this matches your model definition
+                            include: [
+                                {
+                                    model: ModelRegistry,
+                                    as: 'vehicleModel', // Ensure this matches your model definition
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ],
+            group: [
+                fn('DATE', col('Period.createdAt')), // Group by date
+                'uniqueVehicle.id', // Add uniqueVehicle.id to the group
+                'uniqueVehicle->vehicle.id', // Include vehicle ID in grouping if necessary
+                'uniqueVehicle->vehicle.name', // Include vehicle name in grouping if necessary
+                'uniqueVehicle->vehicle->vehicleModel.id', // Include vehicle model ID in grouping
+                'uniqueVehicle->vehicle->vehicleModel.model', // Include model name if necessary
+                'uniqueVehicle->vehicle->vehicleModel.type', // Include model type if necessary
+                'uniqueVehicle->vehicle->vehicleModel.manufacture', // Include manufacture if necessary
+                // Include any additional fields from vehicleModel if necessary
+            ],
+            order: [[fn('DATE', col('Period.createdAt')), 'ASC']] // Sort by date
+        });
+        console.log(results, 'here the reslt')
+        // Transforming results into desired format
+        const transformedResults = results.map((result) => ({
+            createdDate: result.get('createdDate'),
+            PeriodCount: result.get('PeriodCount'),
+            carModel: result.get('carModel'),
+            uniqueVehicleId: result.get('uniqueVehicle.id'), // Optional: include uniqueVehicle id in the results
+        }));
+
+        return transformedResults;
+
+    } catch (error) {
+        console.error('Error fetching period counts:', error);
+        throw error;
+    }
+}
 
 module.exports = {
     createPeriod,
     getPeriodByUser,
+    updatePeriodStatusToInHand,
     getPeriodById,
     updatePeriod,
     deletePeriod,
     getPeriodsByVehicleId,
     isDateRangeAvailable,
     findAvailableUniqueVehicleWithLowestCount,
+    getPeriodCountByDateAndVehicleModel
 };

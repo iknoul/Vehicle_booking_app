@@ -5,8 +5,6 @@ import { FETCH_PERIODS_QUERY } from '@/app/Services/graphql/queries/periodQuarie
 interface Vehicle {
     id: string;
     name: string;
-    model: string;
-    manufacture: string
 }
 interface UniqueVehicle{
     id: string
@@ -20,10 +18,13 @@ interface Period {
     startDate: string;
     endDate: string;
     uniqueVehicle: UniqueVehicle
+    vehicleModelName: string;
+    vehicleManufacture: string;
+    vehicleType: string
 }
 
 interface UseFetchPeriodsResult {
-    data: Period[] | null;
+    data: Period[] | [];
     loading: boolean;
     error: any;
     refetch: Function;
@@ -36,7 +37,7 @@ export const useFetchPeriods = (): UseFetchPeriodsResult => {
     });
 
     // If data is undefined or empty, return null for data
-    const periodsData = data?.periodsByUser || null;
+    const periodsData = data?.periodsByUser || [];
 
     return { data: periodsData, loading, error, refetch };
 };

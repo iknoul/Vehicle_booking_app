@@ -23,7 +23,11 @@ const vehicleType = gql`
 		description: String
 		quantity: Int
 	}
-
+	type PeroidByDateResponse {
+		createdDate: String,
+        PeriodCount: Int,
+        carModel: String,
+	}
 	type DeleteResponse {
 		success: Boolean!
 		message: String!
@@ -32,6 +36,7 @@ const vehicleType = gql`
 	extend type Query {
 		vehicles(model: String, minPrice: Float, maxPrice: Float, startDate: String, endDate: String, limit: Int, filter: Boolean): [Vehicle]
 		vehicle(id: ID!): Vehicle
+		PeroidByDate: [PeroidByDateResponse]
 	}
 
 	extend type Mutation {

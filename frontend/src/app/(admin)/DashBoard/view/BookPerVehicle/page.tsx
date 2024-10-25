@@ -1,66 +1,79 @@
 'use client';
-
 import { lazy, Suspense } from "react";
-import { Booking } from '../../types'; // Import your types
 import { Spin } from "antd";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { useFetchPeriodByDate } from "@/app/hooks/adminHooks/useFetchPeriodByDate";
 
+// Lazy load D3Chart component
+const BookingsChart = lazy(() => import('../components/D3Chart/D3Chart'));
 
-const BookingsChart = lazy(()=>import('../components/D3Chart/D3Chart'))
+interface PeriodData {
+  createdDate: string; // Format 'YYYY-MM-DD' expected
+  PeriodCount: number;
+  carModel: string;
+}
 
-// Example booking data
-const bookingsData: Booking[] = [
-  { date: '2023-09-01', count: 10, car: 'Car A' },
-  { date: '2023-09-01', count: 5, car: 'Car B' },
-  { date: '2023-09-02', count: 20, car: 'Car A' },
-  { date: '2023-09-02', count: 15, car: 'Car B' },
-  { date: '2023-09-03', count: 15, car: 'Car A' },
-  { date: '2023-09-04', count: 15, car: 'Car B' },
-  { date: '2023-09-03', count: 10, car: 'Car C' },
-  { date: '2023-09-04', count: 10, car: 'Car C' },
-  { date: '2023-09-01', count: 10, car: 'Car A' },
-  { date: '2023-09-01', count: 5, car: 'Car B' },
-  { date: '2023-09-02', count: 20, car: 'Car A' },
-  { date: '2023-09-02', count: 15, car: 'Car B' },
-  { date: '2023-09-03', count: 15, car: 'Car A' },
-  { date: '2023-09-04', count: 15, car: 'Car B' },
-  { date: '2023-09-03', count: 10, car: 'Car C' },
-  { date: '2023-09-04', count: 10, car: 'Car C' },
-  { date: '2023-09-01', count: 10, car: 'Car A' },
-  { date: '2023-09-01', count: 5, car: 'Car B' },
-  { date: '2023-12-02', count: 20, car: 'Car A' },
-  { date: '2024-09-02', count: 15, car: 'Car B' },
-  { date: '2023-09-03', count: 15, car: 'Car A' },
-  { date: '2023-09-04', count: 15, car: 'Car B' },
-  { date: '2023-09-03', count: 10, car: 'Car C' },
-  { date: '2024-09-04', count: 10, car: 'Car C' },
-
-];
-
-// Dashboard component
 const DashBoard = () => {
-  // Flatten the data and sum bookings by date
-  const flattenedData = bookingsData.reduce((acc: Booking[], booking) => {
-    // Format the booking date to your preferred format, e.g., 'YYYY-MM-DD'
-   
+  const { periodData, loading } = useFetchPeriodByDate();
+  if (loading) {
+    return <Spin />;
+  }
 
-    const existing = acc.find(d => d.date === booking.date && d.car === booking.car); // Check by formatted date and car
+  // Flatten and aggregate the data by date and car model
+  const aggregatedData = periodData?.reduce((acc: any[], item: PeriodData) => {
+    const existing = acc.find(d => d.createdDate === item.createdDate);
     if (existing) {
-      existing.count += booking.count; // Sum bookings for the same date and car
+      existing[item.carModel] = (existing[item.carModel] || 0) + item.PeriodCount;
     } else {
-      acc.push({ date: booking.date, count: booking.count, car: booking.car });
+      acc.push({ createdDate: item.createdDate, [item.carModel]: item.PeriodCount });
     }
     return acc;
-  }, []);
+  }, []) || [];
 
+  // Get the unique list of car models for creating separate lines
+  const carModels = Array.from(new Set(periodData.map(item => item.carModel)));
 
   return (
     <div>
-      <h3>Bookings Chart</h3>
-      <Suspense fallback="Loading ...">
-        <BookingsChart data={flattenedData} />
+      {/* <h3>Bookings Chart</h3> */}
+      <Suspense fallback={<Spin />}>
+        <ResponsiveContainer width="100%" height={400}>
+          <LineChart
+            width={500}
+            height={300}
+            data={aggregatedData}
+            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="createdDate" />
+            <YAxis />
+            <Tooltip />
+            <Legend />
+            {carModels.map(carModel => (
+              <Line
+                key={carModel}
+                type="monotone"
+                dataKey={carModel}
+                name={carModel}
+                stroke={getRandomColor()}
+                activeDot={{ r: 8 }}
+              />
+            ))}
+          </LineChart>
+        </ResponsiveContainer>
       </Suspense>
     </div>
   );
+};
+
+// Helper function for random colors
+const getRandomColor = () => {
+  const letters = '0123456789ABCDEF';
+  let color = '#';
+  for (let i = 0; i < 6; i++) {
+    color += letters[Math.floor(Math.random() * 16)];
+  }
+  return color;
 };
 
 export default DashBoard;

@@ -35,8 +35,6 @@ const userType = gql`
 	}
 	type VehicleBrief {
 		name: String
-        model: String
-		manufacture: String
 	}
 	type UniqueVehicleBrief {
 		id: String
@@ -49,6 +47,9 @@ const userType = gql`
 		startDate : String
 		endDate : String
 		uniqueVehicle : UniqueVehicleBrief
+		vehicleModelName : String
+		vehicleManufacture: String
+		vehicleType: String
 	}
 
 	extend type Query {

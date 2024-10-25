@@ -13,9 +13,9 @@ const userQueries = {
       return await userController.fetchAdress(pinCode);  
     },
     periodsByUser: async (_, {}, {user}) => {
-      console.log('here inside the peiod')
-      console.log(user?.id,'herer the use id')
-      return await userController.getUserPeriods(user?.id)
+      const a =  await userController.getUserPeriods(user?.id)
+      console.log(a, 'here a @@@')
+      return a
     },
     doit: async() =>{
       return('heloo')

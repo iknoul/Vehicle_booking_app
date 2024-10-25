@@ -18,6 +18,7 @@ const {verifyToken} = require('./middlewares/authMiddleware');
 const responseHandler = require('./responseHandler'); // Adjust path as necessary
 const CustomError = require('./customError'); // Import the CustomError class
 const cleanupJob = require('./services/cleanUpExpiredTimePeriods'); // Import your cron job
+const updatePeriodStatus = require('./services/updatePeriodStatusToInHand')
 
 async function startApolloServer() {
   const app = express();
@@ -65,6 +66,7 @@ async function startApolloServer() {
   await server.start();
   // Start the cron job
   cleanupJob; // Simply accessing the module will start the cron job
+  updatePeriodStatus;
   server.applyMiddleware({ app });
 
   // Start the Express server
