@@ -12,10 +12,12 @@ const ModelRegistry  = sequelize.define('vehicel-model', {
         allowNull: false,
     },
     type: {
-        type: DataTypes.STRING
+        type: DataTypes.STRING,
+        allowNull: false        
     },
     manufacture: {
         type: DataTypes.STRING,
+        allowNull: false
     },
 });
 

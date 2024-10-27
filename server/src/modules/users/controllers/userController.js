@@ -201,7 +201,7 @@ const lockPeriod = async (startDate, endDate, vehicleId, userId) => {
 };
 
 // Create a payment order
-const createPayment = async (tempPeriodId) => {
+const createPayment = async (tempPeriodId, name, mobile) => {
   try {
      // Fetch the TempPeriod record by ID, populating only the uniqueVehicleId
      const tempPeriod = await TempPeriodRepository.findTempPeriodById(tempPeriodId);
@@ -212,7 +212,7 @@ const createPayment = async (tempPeriodId) => {
     const { startDate, endDate, uniqueVehicleId } = tempPeriod;
     const amount = await calculateAmount(uniqueVehicleId, startDate, endDate)
 
-      const order = await paymentService.createOrder(amount); // Call the new createPayment function
+      const order = await paymentService.createOrder(amount, name, mobile); // Call the new createPayment function
       return {
           success: true,
           orderId: order.orderId,

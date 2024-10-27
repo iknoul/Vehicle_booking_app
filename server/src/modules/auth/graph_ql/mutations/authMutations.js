@@ -7,7 +7,7 @@ const authQueries = {
       return await authController.sentOtp(mobile);
     },
     verifyOtp: async (_, { mobile, otp }) => {
-      return await authController.verifyOtp(otp, mobile);
+      return await authController.verifyOtp(mobile, otp);
     },
     login: async(_, {mobile, password}) => {
       return await authController.logIn(mobile, password)

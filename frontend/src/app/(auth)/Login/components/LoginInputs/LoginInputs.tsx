@@ -7,6 +7,7 @@ import {delay} from '@/app/utils/addDelay'
 
 import styles from './loginInputs.module.css'
 import { useRouter } from 'next/navigation'
+import LoaderContainer from '@/app/components/LoaderContainer'
 
 
 const MobileRegex = /[0-9]{10}/
@@ -71,7 +72,7 @@ const LoginInputs:React.FC = ()=>{
     }
 
     return(
-    <Spin spinning={load} indicator={<></>}>
+    <LoaderContainer isLoading={load} spinner={<></>}>
     <div className={styles.loginInputs}>
 
         <h1>Sign-in</h1>
@@ -90,7 +91,7 @@ const LoginInputs:React.FC = ()=>{
             <p>Don't have an account? &nbsp;<a href="Registration">Sign up</a> Here</p>
         </div>
     </div>
-    </Spin>
+    </LoaderContainer>
     )
 }
 

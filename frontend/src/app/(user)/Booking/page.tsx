@@ -13,6 +13,8 @@ import usePayment from '@/app/hooks/userHooks/usePayment';
 import { unescape } from 'querystring';
 import BookingDetails from './components/BookingDetails';
 import { string } from 'three/webgpu';
+import LoaderContiner from '@/app/components/LoaderContainer';
+import Loader from '@/app/components/Loader';
 
 const key = 'updatable';
 
@@ -35,6 +37,7 @@ const BookingPage: React.FC = () => {
     const [location, setLocation] = useState<string>('Calicut');
     const [lockId, setLockId] = useState<string | undefined>(undefined)
     const [amount, setAmount] = useState<number | undefined>(undefined)
+    const [selectedOption, setSelectedOption] = useState<"card" | "upi" | "netbanking">("card")
 
     // const { paymentData } = usePayment()
 
@@ -84,13 +87,17 @@ const BookingPage: React.FC = () => {
             }
        }
     }
-    const handlePayment = async(tempPeriodId: string ) =>{
+    const handlePayment = async(tempPeriodId: string, payType:string ) =>{
         try {
-            await handlePaymentFlow(tempPeriodId);
+            await handlePaymentFlow(tempPeriodId, payType);
             
         } catch (err) {
             
         }
+    }
+    const handleCancel = async () =>{
+        //add temp period deletion hook
+        setStage('lock')
     }
 
     useEffect(()=>{
@@ -114,6 +121,7 @@ const BookingPage: React.FC = () => {
     if(stage !== 'success'){
         return ( 
             <PrivateRoute>
+            <LoaderContiner isLoading={loading || lockLoading} spinner={<Loader/>}>
             <div className={styles.bookingPage} style={{ height: '100vh', width: '100%' }}>
                 <div className={styles.threeDImageContainer}>
                     <ThrerDImage />
@@ -135,14 +143,16 @@ const BookingPage: React.FC = () => {
                         tempPeriodId={lockId} 
                         model={vehicleModel} 
                         location={location}
-                        endDate={endDate}
-                        startDate={startDate}
+                        endDate={formatedEndDate}
+                        startDate={formatedStartDate}
                         setStage={setStage}
                         handlePayment={handlePayment}
+                        handleCancel={handleCancel}
                         amount={amount}
                     />
                 }
             </div>
+            </LoaderContiner>
             </PrivateRoute>
         );
     }

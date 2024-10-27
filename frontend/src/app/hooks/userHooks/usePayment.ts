@@ -40,7 +40,7 @@ const usePayment = () => {
         console.log(success, paymentData, 'Updated success, paymentData');
     }, [success, paymentData]);
 
-    const initiatePayment = async (tempPeriodId: string): Promise<RazorpayResponse> => {
+    const initiatePayment = async (tempPeriodId: string, selectedOption: string, ): Promise<RazorpayResponse> => {
         setLoading(true);
         setError(null);
         setSuccess(false);
@@ -52,7 +52,7 @@ const usePayment = () => {
                 },
             });
 
-            const { orderId, amount: orderAmount } = data.createPayment;
+            const { orderId, amount: orderAmount, userName, userMobile} = data.createPayment;
 
             // Start Razorpay payment process
             return await new Promise<RazorpayResponse>((resolve, reject) => {
@@ -68,15 +68,24 @@ const usePayment = () => {
                     },
                     modal: {
                         analytics: false,
+                        ondismiss: async function () {
+                            // This function will be triggered if the payment window is closed
+                            setError('Payment was canceled by the user.');
+                            reject(new Error('Payment canceled by the user.'));
+                        }
                     },
                     theme: {
                         color: 'rgba(208, 180, 42, 0.947)',
                     },
                     prefill: {
-                        name: 'Your Name',
+                        name: userName,
                         email: 'customer@example.com',
-                        contact: '1234567890',
+                        contact: userMobile,
                     },
+                     // Additional configuration based on selected payment option
+                    notes: {
+                        paymentMethod: selectedOption // Store user-selected payment option
+                    }
                 };
 
                 if (window.Razorpay) {
@@ -101,7 +110,7 @@ const usePayment = () => {
         setError(null);
 
         try {
-            await verifyPayment({
+            const errorreult = await verifyPayment({
                 variables: {
                     orderId: response.razorpay_order_id,
                     paymentId: response.razorpay_payment_id,
@@ -109,7 +118,7 @@ const usePayment = () => {
                     tempPeriodId,
                 },
             });
-
+            alert(errorreult)
             setSuccess(true);
             setPaymentData(response);
             await delay(1000);
@@ -122,16 +131,17 @@ const usePayment = () => {
         }
     };
 
-    const handlePaymentFlow = async (tempPeriodId: string) => {
+    const handlePaymentFlow = async (tempPeriodId: string, selectedOption: string) => {
         setLoading(true);
         setError(null);
         setSuccess(false);
+        alert(selectedOption)
 
         try {
-            const response = await initiatePayment(tempPeriodId);
+            const response = await initiatePayment(tempPeriodId, selectedOption);
+            console.log('response')
             await verifyPaymentHandler(response, tempPeriodId);
             setPaymentData(response)
-            alert('only noe the data')
         } catch (error) {
             console.error('Payment flow error:', error);
         } finally {

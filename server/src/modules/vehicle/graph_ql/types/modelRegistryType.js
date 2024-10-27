@@ -13,6 +13,20 @@ type DeleteResponse {
   success: Boolean!
   message: String!
 }
+type ErrorRow {
+  rowIndex: Int!
+  errorMessage: String!
+}
+type ErrorFile {
+  file: String  # Use base64 encoded string for file
+  filename: String!
+}
+type UploadResponse {
+  success: Boolean!
+  errorRows: [ErrorRow]!
+  file: String  # Optional for error files
+  filename: String  # Optional for error files
+}
 
 extend type Query {
   modelRegistries: [ModelRegistry]
@@ -32,5 +46,6 @@ extend type Mutation {
     manufacture: String, 
   ): ModelRegistry
   deleteModelRegistry(id: ID!): DeleteResponse
+  uploadModelRegistryExcel(file: Upload!): UploadResponse
 }`;
 module.exports = ModelRegistryType;

@@ -2,7 +2,7 @@
 const crypto = require('crypto');
 const razorpay = require('../../config/razor-pay-config');
 // require('dotenv').config({ path: '../../.env' });
-const createOrder = async (amount) => {
+const createOrder = async (amount, userName, userMobile) => {
     // Create Razorpay order
     const order = await razorpay.orders.create({
         amount: amount * 100, // Convert amount to paise
@@ -12,7 +12,9 @@ const createOrder = async (amount) => {
 
     return {
         orderId: order.id,
-        amount: order.amount
+        amount: order.amount,
+        userName: userName,
+        userMobile: userMobile
     };
 };
 

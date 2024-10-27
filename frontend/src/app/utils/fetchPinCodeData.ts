@@ -1,11 +1,11 @@
-const https = require('https');
+import https from 'https';
 
-function fetchPincodeData(pincode) {
+function fetchPincodeData(pincode: string): Promise<string> {
     return new Promise((resolve, reject) => {
-        const options = {
+        const options: https.RequestOptions = {
             method: 'GET',
             hostname: 'api.postalpincode.in',
-            port: null,
+            port: undefined,
             path: `/pincode/${pincode}`,
             headers: {
                 'Content-Type': 'application/json',
@@ -13,9 +13,9 @@ function fetchPincodeData(pincode) {
         };
 
         const req = https.request(options, (res) => {
-            const chunks = [];
+            const chunks: Buffer[] = [];
 
-            res.on('data', (chunk) => {
+            res.on('data', (chunk: Buffer) => {
                 chunks.push(chunk);
             });
 
@@ -29,8 +29,12 @@ function fetchPincodeData(pincode) {
             });
         });
 
+        req.on('error', (err) => {
+            reject(err);
+        });
+
         req.end();
     });
 }
 
-export default fetchPincodeData
+export default fetchPincodeData;

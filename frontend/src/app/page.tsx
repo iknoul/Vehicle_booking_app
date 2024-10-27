@@ -1,6 +1,5 @@
 'use client'
 import { ApolloProvider } from '@apollo/client';
-import PageLoadingProvider  from '@/app/context/PageLoadingProvider'
 import client from '../../apollo/apolloClient';  // Import Apollo Client
 import HeroSection from './components/HeroSection';
 import PopularBrands from './components/PopularBrands';
@@ -9,12 +8,14 @@ import PopularCars from './components/PopularCars';
 import CtaSection from './components/CtaSection';
 import SearchBar from './components/SerchBar';
 import SeachCarResults from './components/SearchCarResults';
+import Loader from './components/Loader';
+import LoaderContainer from './components/LoaderContainer';
 
-
-import styles from "./page.module.css";
 import { useEffect, useState } from 'react';
 import { Spin } from 'antd';
 import { usePageLoading } from './hooks/pageLoadingHook/usePageLoadingHook';
+import styles from "./page.module.css";
+
 
 
 
@@ -61,7 +62,7 @@ export default function Home() {
   
   return (
     <ApolloProvider client={client}>
-      <Spin spinning={isPageLoading} className={styles.landingPage}>
+      <LoaderContainer isLoading={isPageLoading} spinner={<Loader />}>
         <HeroSection />
         <div className={styles.bodyContainer}>
           <SearchBar 
@@ -92,7 +93,7 @@ export default function Home() {
           <PopularCars />
         </div>
         <CtaSection />
-      </Spin>
+      </LoaderContainer>
     </ApolloProvider>
   );
 }

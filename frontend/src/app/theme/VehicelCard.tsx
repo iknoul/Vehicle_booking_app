@@ -5,6 +5,7 @@ import { useState } from 'react'
 
 import styles from './styles/vehicelCard.module.css'
 import { useRouter } from 'next/navigation';
+import { usePageLoading } from '../hooks/pageLoadingHook/usePageLoadingHook'
 
 
 
@@ -30,7 +31,7 @@ interface Props{
 const VehicelCard:React.FC<Props> = ({carData}) =>{
 
     const router = useRouter()
-
+    const {triggerTransition} = usePageLoading()
     const [currentIndex, setCurrentIndex] = useState(0);
 
     // Handler to go to the next image
@@ -47,7 +48,7 @@ const VehicelCard:React.FC<Props> = ({carData}) =>{
         }
     };
     const bookVehicle = () => {
-        router.push(`/Booking?id=${carData.id}&model=${carData.model}`);
+        triggerTransition(()=> router.push(`/Booking?id=${carData.id}&model=${carData.model}`))    
     }
     return(
         <div className={styles.vehicelCard}>

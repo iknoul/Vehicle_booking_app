@@ -22,10 +22,14 @@ const sentOtp = async(mobile) =>{
 
 const verifyOtp = async(mobile, otp) =>{
   try {
+		console.log(mobile, otp, 'here the data')
 		otpService.verifyOTP(mobile, otp);
     	const loginToken = jwt.createToken({ mobile, stage:'otpVerified',})
+		console.log(loginToken, 'here the login token')
 		return {success: true, message:"Otp send Succesfully", token: loginToken}
 	} catch (error) {
+		console.log(error)
+		throw new Error(error)
     // throw error
   }
 }
@@ -46,7 +50,7 @@ const logIn = async (mobile, password) => {
 		}
 
 		// Create a token
-		const loginToken = jwt.createToken({ mobile, stage: 'loggedIn', id:user.id });
+		const loginToken = jwt.createToken({ mobile, stage: 'loggedIn', id:user.id, name: user.name});
 		return { success: true, message: 'Login successful', token: loginToken };
 	} catch (error) {
 		return { success: false, message: error.message };

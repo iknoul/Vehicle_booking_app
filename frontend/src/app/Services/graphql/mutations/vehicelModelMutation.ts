@@ -40,3 +40,17 @@ export const UPDATE_VEHICLE_MODEL_MUTATION = gql`
   }
 `;
 
+export const UPLOAD_EXCEL_MUTATION = gql`
+  mutation UploadModelRegistryExcel($file: Upload!) {
+    uploadModelRegistryExcel(file: $file) {
+      success
+      errorRows{
+        rowIndex
+        errorMessage
+      }
+      file  # Add this line
+      filename  # Add this line
+    }
+  }
+`;
+

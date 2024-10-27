@@ -11,7 +11,7 @@ export const LOGIN_MUTATION = gql`
     ) {
       success
       message
-      token
+      token 
     }
   }
 `;
@@ -26,7 +26,7 @@ export const SEND_OTP_MUTATION = gql`
 `
 
 export const VERIFY_MOBILE_MUTATION = gql`
-  mutation CreateVehicle($otp: String!, $mobile: String!) {
+  mutation VerifyOtp($otp: String!, $mobile: String!) {
     verifyOtp(otp: $otp, mobile:$mobile) {
       success
       token

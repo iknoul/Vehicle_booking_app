@@ -1,5 +1,7 @@
 const { GraphQLUpload } = require('graphql-upload');
 const userController = require('../../controllers/userController');
+const jwt = require('./../../../../services/jwt-servise')
+
 const uploadProfilePic = require('./../../../../../utils/uploadImage')
 
 
@@ -8,16 +10,25 @@ const userMutations = {
   Upload: GraphQLUpload, // Add this line to handle Upload scalar
   
   Mutation: {
-    createUser: async (_, { name, email, mobile, password, profilePic }, {user}) => {
+    createUser: async (_, { name, email, mobile, password, profilePic, token }, {user}) => {
+      try {
+        const data = jwt.verifyToken(token); // Verify the token
+        if(!data || !(data.mobile == mobile) || !(data.stage === 'otpVerified')){
+          throw new Error('Forbidden: Invalid token.');
+        }
+      } catch (error) {
+          console.error('Token verification failed:', error);
+          throw new Error('Forbidden: Invalid token.'); // Throw an error for invalid token
+      }
       console.log('came here')
       // const profilePicUrl = await uploadProfilePic(profilePic);
-
+      
       const newUser = await userController.createUser({
         name,
         email,
         mobile,
         password,
-        profilePic
+        profilePic,
       })
       console.log('here but not @@@@@@@')
       return newUser;
@@ -47,7 +58,7 @@ const userMutations = {
       return result;
     },
     createPayment: async(_, { tempPeriodId }, {user}) => {
-      return await userController.createPayment(tempPeriodId)
+      return await userController.createPayment(tempPeriodId, user.name, user.mobile)
     },
     verifyPayment: userController.rentVehicle
     

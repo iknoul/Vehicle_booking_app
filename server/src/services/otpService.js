@@ -11,7 +11,7 @@ exports.generateOTP = (mobile) => {
 
 exports.verifyOTP = (mobile, otp) => {
     
-    console.log(otp)
+    console.log(otp, otps)
     if (!otps[mobile]) {
         throw new AccessDenied('Access  denied');
     }

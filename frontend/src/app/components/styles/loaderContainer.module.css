@@ -1,0 +1,36 @@
+.loaderOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.loaderContent {
+  z-index: 1000;
+  color: white;
+}
+
+.extraContent {
+  position: fixed;
+  top: 10%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1001; /* Higher than the loader content */
+  color: white;
+  text-align: center1
+}
+
+.contentBlurred {
+  filter: blur(1px);
+}
+
+.afterLoadContent {
+  margin-top: 20px;
+  text-align: center;
+}

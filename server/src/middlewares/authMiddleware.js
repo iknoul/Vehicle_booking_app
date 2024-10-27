@@ -14,7 +14,7 @@ const verifyToken = async ({ req }) => {
     const { body: { operationName } } = req;
     console.log(operationName, 'here the operation names')
     const isPublicQuery = operationName === 'Vehicles'; // Add more public queries as needed
-    const isLoginOrRegister = operationName === 'Login' || operationName === 'register';
+    const isLoginOrRegister = operationName === 'Login' || operationName === 'VerifyOtp' || operationName === 'SendOtp'|| operationName ==='CreateUser';
 
     // Skip authentication for login and registration
     if (isLoginOrRegister || isPublicQuery) {

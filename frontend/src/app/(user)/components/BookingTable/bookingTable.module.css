@@ -1,6 +1,7 @@
 
   .bookingSection {
     width: 100%;
+    overflow-y: scroll;
     /* max-width: 800px; */
     /* background-color: white; */
 
@@ -43,5 +44,8 @@
     /* background-color: #d2a9168a; */
     background-color: rgba(70, 16, 16, 0.575);
     color: rgb(255, 255, 255);
+  }
+  .bookingTable thead {
+    /* background-color: #d2a9168a; */
   }
   
