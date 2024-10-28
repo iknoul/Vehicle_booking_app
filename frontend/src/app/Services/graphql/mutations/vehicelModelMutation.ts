@@ -23,7 +23,7 @@ export const UPDATE_VEHICLE_MODEL_MUTATION = gql`
   mutation updateModelRegistry(
     $id: ID!,
     $model: String,
-    $type: String!,
+    $type: String,
     $manufacture: String,
   ) {
     updateModelRegistry(

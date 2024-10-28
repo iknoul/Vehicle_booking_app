@@ -14,11 +14,14 @@ const authResolvers = require('./modules/auth/graph_ql/resolvers/authResolvers')
 const modelRegistryType = require('./modules/vehicle/graph_ql/types/modelRegistryType')
 const vehicelResolvers = require('./modules/vehicle/graph_ql/resolvers/vehicleResolvers')
 const modelRegistryResolvers = require('./modules/vehicle/graph_ql/resolvers/modelRegistryResolvers')
+const errorDataType = require('./modules/vehicle/graph_ql/types/errorDataType');
+const errorDataResolvers = require('./modules/vehicle/graph_ql/resolvers/errorDataResolvers');
 const {verifyToken} = require('./middlewares/authMiddleware');
 const responseHandler = require('./responseHandler'); // Adjust path as necessary
 const CustomError = require('./customError'); // Import the CustomError class
 const cleanupJob = require('./services/cleanUpExpiredTimePeriods'); // Import your cron job
 const updatePeriodStatus = require('./services/updatePeriodStatusToInHand')
+// const seedAdmin = require("./seeds/seedAdmin")
 
 async function startApolloServer() {
   const app = express();
@@ -38,8 +41,8 @@ async function startApolloServer() {
 
   // Create ApolloServer instance
   const server = new ApolloServer({
-    typeDefs: mergeTypes([baseSchema, userType, vehicelType, modelRegistryType, authType], { all: true }),
-    resolvers: mergeResolvers([userResolvers, vehicelResolvers, modelRegistryResolvers, authResolvers]),
+    typeDefs: mergeTypes([baseSchema, userType, vehicelType, modelRegistryType, authType, errorDataType], { all: true }),
+    resolvers: mergeResolvers([userResolvers, vehicelResolvers, modelRegistryResolvers, authResolvers, errorDataResolvers]),
 
     context: async ({ req }) => {
       // Use the authMiddleware to authenticate and return user info
@@ -67,6 +70,7 @@ async function startApolloServer() {
   // Start the cron job
   cleanupJob; // Simply accessing the module will start the cron job
   updatePeriodStatus;
+  // seedAdmin
   server.applyMiddleware({ app });
 
   // Start the Express server

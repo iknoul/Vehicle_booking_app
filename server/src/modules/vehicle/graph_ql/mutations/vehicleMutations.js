@@ -9,14 +9,12 @@ const vehicleMutations = {
   Upload: GraphQLUpload, // Add this line to handle Upload scalar
 
   Mutation: {
-    createVehicle: async (_, { name, price, modelId, description, quantity, image }) => {
+    createVehicle: async (_, { name, price, modelId, description, quantity, image }, { user }) => {
 
-      if (!user) { // Assume req.user is set by some middleware
-        // console.log('herer but hereeee', res)
-        res.statusCode = 800; // Set status code using the res object
-        // console.log('look here you may found', res.statusCode)
-        throw new CustomError('You must be logged in to create a user.', 901);
+      if(!user.role === 'admin' ){
+        throw new Error('UnAuthorized, you don`t have access to this route')
       }
+
       validateVehicle({ name, price, modelId, description, quantity, image })
       console.log(_, "idk")
       const newVehicle = await vehicleController.createVehicle({
@@ -29,7 +27,12 @@ const vehicleMutations = {
       });
       return newVehicle;
     },
-    updateVehicle: async (_, { id, name, price, description, quantity, image, modelId }, { req, res }) => {
+    updateVehicle: async (_, { id, name, price, description, quantity, image, modelId }, { user }) => {
+
+      if(!user.role === 'admin' ){
+        throw new Error('UnAuthorized, you don`t have access to this route')
+      }
+      
       const updatedVehicle = await vehicleController.updateVehicle(id, {
         name,
         modelId,
@@ -41,8 +44,12 @@ const vehicleMutations = {
       // return res.status(201).json(updatedVehicle);
       return updatedVehicle;
     },
-    deleteVehicle: async (_, { id }) => {
-      console.log(id)
+    deleteVehicle: async (_, { id }, { user }) => {
+
+      if(!user.role === 'admin' ){
+        throw new Error('UnAuthorized, you don`t have access to this route')
+      }
+
       const result = await vehicleController.deleteVehicle(id);
       return result;
     },

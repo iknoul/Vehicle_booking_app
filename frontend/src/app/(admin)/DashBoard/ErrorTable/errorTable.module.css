@@ -1,0 +1,78 @@
+
+.operation {
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    color: #ff4d4f; /* Change color on hover */
+    gap: 10px;
+    align-items: center;
+    justify-content: center; /* Center the icons horizontally */
+    text-align: center;
+}
+
+.operation i {
+    transition: color 0.3s ease; /* Smooth transition for hover */
+}
+.operation i:last-child{
+    color:#ff7875;
+}
+.operation:hover {
+    color: #c00b0ec1; /* Change color on hover */
+}
+
+/* Button styling */
+.button {
+    margin-bottom: 8px; /* Add space below the button */
+    background-color: #ff4d4f; /* Custom button color */
+    border: none;
+}
+
+.button:hover {
+    background-color: #ff7875; /* Hover color */
+    border: none;
+}
+
+/* Container styling */
+.d {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding: 16px; /* Add padding around the container */
+}
+
+/* Table container */
+.ant-table-wrapper {
+    width: 100%;
+}
+.table{
+    width: 100%;
+  gap: 10px;
+}
+.button {
+    padding: 10px 20px;
+    background-color: #2573c6;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .button:hover {
+    background-color: #0056b3;
+  }
+  
+  .note {
+    font-size: 14px;
+    color: #6c757d;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    padding: 5px;
+    border-left: 4px solid #007bff;
+    background-color: #f8f9fa;
+    border-radius: 3px;
+  }
+  

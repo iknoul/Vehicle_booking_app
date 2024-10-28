@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useForm, Controller, FieldError } from "react-hook-form";
-import { useCreateVehicleModel } from '@/app/hooks/vehicleHooks/useCreateVehicleModel';
-import { useUpdateVehicleModel } from '@/app/hooks/vehicleHooks/useUpdateVehicleModel';
 import styles from './addNewModel.module.css';
 
 interface MyProps {
@@ -10,6 +8,7 @@ interface MyProps {
   setFail: Function;
   onCancel: Function;
   vehicleData?: FormValues | null;
+  onSubmit: (data: FormValues, onHandleCancel: () => void) => void;
 }
 
 interface FormValues {
@@ -28,41 +27,27 @@ interface InputField {
 }
 
 const Types = ["SUV", "HATCH_BACK", "SEDAN"];
+
 const inputFields: InputField[] = [
   { label: "Model Name", placeholder: "Enter the model name", name: "model", required: true },
   { label: "Manufacture Name", placeholder: "Enter the manufacture name", name: "manufacture", required: true },
 ];
 
-const AddNewModel: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleData, setSuccess, setFail }) => {
-  const { createNewVehicleModel } = useCreateVehicleModel();
-  const { updateExistingVehicleModel } = useUpdateVehicleModel();
-  const { control, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({ defaultValues: { model: '', manufacture: '' } });
-  const [isLoading, setIsLoading] = useState(false);
-
-  const onSubmit = async (data: FormValues) => {
-    setIsLoading(true);
-    try {
-      if (data.id) {
-        await updateExistingVehicleModel({ id: data.id, model: data.model, type: data.type, manufacture: data.manufacture });
-      } else {
-        await createNewVehicleModel({ model: data.model, type: data.type, manufacture: data.manufacture });
-      }
-      setSuccess(true);
-      setTimeout(() => { setSuccess(false); }, 2000);
-    } catch (error) {
-      setFail(true);
-      setTimeout(() => { setFail(false); }, 2000);
-      console.error('Error creating vehicle:', error);
-    } finally {
-      reset();
-      onHandleCancel();
-      setIsLoading(false);
-    }
-  };
+const AddNewModel: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleData, onSubmit }) => {
+  const { control, handleSubmit, reset, formState: { errors } } = useForm<FormValues>({ defaultValues: { model: '', manufacture: '', type: '' } });
 
   const onHandleCancel = () => {
     reset();
     onCancel();
+  };
+
+  const onSubmitHandler = (data: FormValues) => {
+    // Ensure that the type field is provided
+    if (!data.type) {
+      data.type = Types[0];  // Default to the first type if not provided
+    }
+
+    onSubmit(data, onHandleCancel);
   };
 
   useEffect(() => {
@@ -70,7 +55,7 @@ const AddNewModel: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleDat
       if (vehicleData) {
         reset(vehicleData);
       } else {
-        reset({ id: undefined, model: '', manufacture: '' });
+        reset({ id: undefined, model: '', manufacture: '', type: '' });
       }
     }
   }, [isAddVehicleOpen, vehicleData, reset]);
@@ -78,8 +63,7 @@ const AddNewModel: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleDat
   return (
     <div className={`${styles.modal} ${isAddVehicleOpen ? styles.show : styles.hide}`}>
       <div className={styles.modalContent}>
-        {isLoading && <div className={styles.loading}>Loading...</div>}
-        <form onSubmit={handleSubmit(onSubmit)} className={styles.form}>
+        <form onSubmit={handleSubmit(onSubmitHandler)} className={styles.form}>
           <div className={styles.formItem}>
             <label className={styles.label}>Vehicle Type</label>
             <Controller

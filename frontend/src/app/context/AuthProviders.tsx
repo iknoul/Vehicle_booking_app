@@ -25,7 +25,7 @@ const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
 		if(user){
 			setToken(token)
 			setUserId(user.id)
-			// setRole(user?.role)
+			setRole(user.role)
 			const expiryTime = user.exp; // Extract the expiry time
 			// Set the token and its expiry
 			sessionManager.setToken(token, expiryTime, handleLogOut);

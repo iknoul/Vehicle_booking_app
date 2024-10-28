@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { useUploadExcelFile } from "@/app/hooks/vehicleHooks/useUploadExcelFile"; // Custom hook for file upload
 import styles from "./addVehicleFromExcel.module.css";
+import { message } from "antd";
 
 interface MyProps {
   isAddVehicleFromExcelOpen: boolean;
   onCancel: () => void;
+  onSubmit: Function
 }
 
-const AddVehicleFromExcel: React.FC<MyProps> = ({ isAddVehicleFromExcelOpen, onCancel }) => {
+const AddVehicleFromExcel: React.FC<MyProps> = ({ isAddVehicleFromExcelOpen, onCancel, onSubmit }) => {
   const [fileList, setFileList] = useState<File[]>([]);
-  const { uploadExcelFile, loading, error } = useUploadExcelFile(); // Use the mutation hook
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -18,42 +19,12 @@ const AddVehicleFromExcel: React.FC<MyProps> = ({ isAddVehicleFromExcelOpen, onC
     }
   };
 
-  const onSubmit = async () => {
-    if (fileList.length === 0) {
-        alert('Please select a file to upload.');
-        return;
-    }
-
-    const formData = new FormData();
-    fileList.forEach(file => {
-        formData.append('file', file);
-    });
-
-    try {
-        const response = await uploadExcelFile(fileList[0]);
-        if (response.success) {
-            alert('File uploaded successfully');
-        } else if (response.file && response.filename) {
-            const blob = new Blob([response.file], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const url = URL.createObjectURL(blob);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = response.filename;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            alert('File processed with errors. Please check the downloaded error report.');
-        }
-    } catch (err) {
-        console.error("Error uploading file:", err);
-        alert('File upload failed.');
-    }
-
-    setFileList([]);
-    onCancel();
-};
-
-
+ const onHandleSubmit = () => {
+      if(! beforeUpload(fileList[0])){
+        return 
+      }
+      onSubmit(fileList, onHandleCancel)
+  }
   const onHandleCancel = () => {
     setFileList([]);
     onCancel();
@@ -63,7 +34,7 @@ const AddVehicleFromExcel: React.FC<MyProps> = ({ isAddVehicleFromExcelOpen, onC
     const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' || 
                     file.type === 'application/vnd.ms-excel';
     if (!isExcel) {
-      alert('You can only upload Excel files!');
+      message.warning({content:'You can only upload Excel files!'})
     }
     return isExcel;
   };
@@ -98,10 +69,6 @@ const AddVehicleFromExcel: React.FC<MyProps> = ({ isAddVehicleFromExcelOpen, onC
               <p className={styles.fileNames}>Files selected: {fileList.map(file => file.name).join(', ')}</p>
             </div>
           )}
-
-          {loading && <p>Uploading...</p>}
-          {error && <p style={{ color: 'red' }}>Error: {error.message}</p>}
-
           <div className={styles.buttonGroup}>
             <button
               onClick={onHandleCancel}
@@ -110,11 +77,11 @@ const AddVehicleFromExcel: React.FC<MyProps> = ({ isAddVehicleFromExcelOpen, onC
               Cancel
             </button>
             <button
-              onClick={onSubmit}
+              onClick={onHandleSubmit}
               className={`${styles.button} ${styles.submitButton}`}
-              disabled={loading}
+              // disabled={loading}
             >
-              {loading ? 'Uploading...' : 'Submit'}
+              Submit
             </button>
           </div>
         </div>

@@ -5,7 +5,8 @@ const otpService = require('./../../../services/otpService')
 const jwt = require('./../../../services/jwt-servise')
 const bcrypt = require('bcrypt');
 
-const User = require('./../../users/schema/userModel')
+const User = require('./../../users/schema/userModel');
+const Admin = require('../../admin/schema/adminModel');
 // const Admin = require('./../../admin/')
 
 //Fetch addrss details from pinCode
@@ -38,26 +39,46 @@ const logIn = async (mobile, password) => {
 	try {
 		// Find the user by mobile
 		console.log(mobile, 'here i print the mobile number')
-		const user = await User.findOne({ where: { mobile } });
-		if (!user) {
-		return { success: false, message: 'User not found' };
-		}
+		const admin = await Admin.findOne({where: {mobile}})
+		let id = null
+		let name = null
+		let role = null
 
-		// Check if the password matches
-		const isPasswordValid = await bcrypt.compare(password, user.password);
-		if (!isPasswordValid) {
-		return { success: false, message: 'Invalid password' };
+		if(admin){
+			// Check if the password matches
+			const isPasswordValid = await bcrypt.compare(password, admin.password);
+			if (!isPasswordValid) {
+				return { success: false, message: 'Invalid password' };
+			}
+			name = admin.name
+			id = admin.id
+			role = 'admin'
+		}
+		else{
+			const user = await User.findOne({ where: { mobile } });
+				if (!user) {
+				return { success: false, message: 'User not found' };
+			}
+
+			// Check if the password matches
+			const isPasswordValid = await bcrypt.compare(password, user.password);
+				if (!isPasswordValid) {
+				return { success: false, message: 'Invalid password' };
+			}
+			name = user.name
+			id = user.id
+			role = 'user'
 		}
 
 		// Create a token
-		const loginToken = jwt.createToken({ mobile, stage: 'loggedIn', id:user.id, name: user.name});
+		const loginToken = jwt.createToken({ mobile, stage: 'loggedIn', id : id, name : name, role: role});
 		return { success: true, message: 'Login successful', token: loginToken };
 	} catch (error) {
 		return { success: false, message: error.message };
 	}
 };
 
-const logOut = (req, res) => {
+const logOut = () => {
   // Invalidate the token on the client-side
   // You can also implement a token blacklist strategy if needed
   return { success: true, message: 'Logged out successfully' };

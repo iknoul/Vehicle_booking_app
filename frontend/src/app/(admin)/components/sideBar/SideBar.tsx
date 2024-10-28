@@ -24,9 +24,9 @@ const SideBarItems = [
         href: '/DashBoard/Aset',
     },
     {
-        label : 'DashBoard',
-        icon: 'fa-solid fa-chart-line xl',
-        href: '/DashBoard/view/BookPer',
+        label : 'ErrorTable',
+        icon: 'fa-solid fa-circle-exclamation xl',
+        href: '/DashBoard/ErrorTable',
     },
 ] 
 const SideBar:React.FC <MyProps>= ({})=>{

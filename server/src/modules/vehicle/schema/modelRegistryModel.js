@@ -9,6 +9,7 @@ const ModelRegistry  = sequelize.define('vehicel-model', {
     },
     model: {
         type: DataTypes.STRING,
+        unique: true,
         allowNull: false,
     },
     type: {

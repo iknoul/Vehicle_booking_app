@@ -6,7 +6,7 @@ import PrivateRoute from '../components/PrivateRouter';
 export default function UserLayout({ children }: { children: React.ReactNode }) {
   return (
     <div>
-      <PrivateRoute>
+      <PrivateRoute requiredRole='user'>
         <NavBar />
         {children}
       </PrivateRoute>

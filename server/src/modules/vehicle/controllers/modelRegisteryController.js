@@ -1,5 +1,6 @@
 // modules/vehicle/controllers/vehicleController.js
 const modelRegistryRepository = require('../repositories/modelRegistryRespositories'); // Repository layer
+const {saveErrorData, deleteErrorById} = require("../repositories/errorDataRepositories")
 const xlsx = require('xlsx'); // Library for reading Excel files
 
 // Get all vehicles
@@ -12,7 +13,7 @@ const getModelRegistryById = async (id) => {
   	return await modelRegistryRepository.findModelRegistryById(id);
 };
 
-// Create a new vehicle (including image upload to MinIO)
+// Create a new vehicle model (including image upload to MinIO)
 const createModelRegistry = async ({ model, manufacture, type}) => {
 	try {
 		// Save vehicle to the database
@@ -27,6 +28,7 @@ const createModelRegistry = async ({ model, manufacture, type}) => {
 		throw new Error('Failed to create vehicle');
 	}
 };
+// Create a new vehicle model from excel file
 const processExcelFile = async (stream, filename) => {
     const chunks = [];
     for await (const chunk of stream) {
@@ -60,13 +62,32 @@ const processExcelFile = async (stream, filename) => {
                     type: row.type || null,
                     manufacture: row.manufacture || null,
                 });
+                // If the model is created successfully and the row has an ID, delete it from the error table
+                if (row.id) {
+                    await deleteErrorById(row.id);
+                }
             } catch (error) {
                 errorRows.push({ rowIndex: i + 2, ...row, errorMessage: error.message });
             }
         }
 
         if (errorRows.length > 0) {
-            const errorHeaders = ["Row Index", "Model", "Type", "Manufacture", "Error Message"];
+            // Generate a unique groupId for this batch of errors
+            const formatDateComponent = (component) => component.toString().padStart(2, '0');
+
+            const date = new Date();
+            const day = formatDateComponent(date.getDate());
+            const month = formatDateComponent(date.getMonth() + 1); // Months are 0-based
+            const year = date.getFullYear();
+            const hours = formatDateComponent(date.getHours());
+            const minutes = formatDateComponent(date.getMinutes());
+
+            const groupId = `error_${day}_${month}_${year}_${hours}_${minutes}`;
+
+            // Save the error data to the database
+            await saveErrorData(errorRows, groupId);
+
+            const errorHeaders = ["Row Index", "model", "type", "manufacture", "Error Message"];
             const errorWorksheetData = [errorHeaders, ...errorRows.map(row => [
                 row.rowIndex,
                 row.model,

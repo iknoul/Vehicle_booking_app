@@ -50,7 +50,7 @@ export const useUploadExcelFile = () => {
             link.click();
           }
 
-          throw new Error(errorMessage); // Throw error with the constructed message
+          // throw new Error(errorMessage); // Throw error with the constructed message
         }
 
         return data.uploadModelRegistryExcel; // Return the successful response

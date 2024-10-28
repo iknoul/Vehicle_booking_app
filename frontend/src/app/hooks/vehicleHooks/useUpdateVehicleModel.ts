@@ -21,6 +21,7 @@ export const useUpdateVehicleModel = () => {
         id: vehicleModelData.id,
         model: vehicleModelData.model,
         manufacture: vehicleModelData.manufacture,
+        type : vehicleModelData.type
       };
 
       const { data } = await updateModelRegistry({ variables });

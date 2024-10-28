@@ -6,10 +6,12 @@ const CustomError = require('../../../../customError')
 const modelRegistryMutations = {
     Upload: GraphQLUpload, // Add this line to support file uploads
     Mutation: {
-        createModelRegistry: async (_, { model, manufacture, type }) => {
-            console.log(_, "idk")
-            console.log('type here and .. rest', model, manufacture, type)
+        createModelRegistry: async (_, { model, manufacture, type }, { user }) => {
 
+            if(!user.role === 'admin' ){
+                throw new Error('UnAuthorized, you don`t have access to this route')
+            }
+            
             const newVehicleModel = await modelRegistryController.createModelRegistry({
                 model,
                 manufacture, // Array of image URLs
@@ -17,7 +19,11 @@ const modelRegistryMutations = {
             });
             return newVehicleModel;
         },
-        uploadModelRegistryExcel: async (_, { file }) => {
+        uploadModelRegistryExcel: async (_, { file }, { user }) => {
+
+            if(!user.role === 'admin' ){
+                throw new Error('UnAuthorized, you don`t have access to this route')
+            }
             const { createReadStream, filename } = await file;
             const stream = createReadStream();
             try {
@@ -42,7 +48,12 @@ const modelRegistryMutations = {
             }
         },        
         
-        uploadModelRegistryExcel: async (_, { file }) => {
+        uploadModelRegistryExcel: async (_, { file }, { user }) => {
+
+            if(!user.role === 'admin' ){
+                throw new Error('UnAuthorized, you don`t have access to this route')
+            }
+
             const { createReadStream, filename } = await file;
             const stream = createReadStream();
             try {
@@ -61,7 +72,12 @@ const modelRegistryMutations = {
             }
         },
         
-        deleteModelRegistry: async (_, { id }) => {
+        deleteModelRegistry: async (_, { id }, { user }) => {
+
+            if(!user.role === 'admin' ){
+                throw new Error('unAuthorized, you don`t have access to this route')
+            }
+
             console.log(id)
             const result = await modelRegistryController.deleteModelRegistry(id);
             return result;
