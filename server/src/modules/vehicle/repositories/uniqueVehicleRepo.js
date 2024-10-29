@@ -23,8 +23,30 @@ const createUniqueVehicle = async (data) => {
     return await uniqueVehicle.create(data);
 };
 
-
+// Delete a vehicle by ID
+const deleteUniqueVehicle = async (id) => {
+    const vehicle = await uniqueVehicle.findByPk(id);
+    if (vehicle) {
+      await vehicle.destroy();
+      return true;
+    }
+    return false;
+  };
+// delete Unique-vehicle veicle Id
+const DeleteUniqueVehicleByVehicle = async (vehicleId, transaction) => {
+    try {
+        uniqueVehicle.destroy({
+            where: {vehicleId : vehicleId},
+            transaction
+        })
+    } catch (error) {
+        console.log('here inside the unique vehicle the error')
+        throw new Error('error in deleting unique vehicle ')
+    }
+}
 module.exports = {
     createUniqueVehicle,
     hasNoPeriods,
+    deleteUniqueVehicle,
+    DeleteUniqueVehicleByVehicle
 };

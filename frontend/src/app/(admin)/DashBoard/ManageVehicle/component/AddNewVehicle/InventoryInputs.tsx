@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Input, Button, Modal } from 'antd';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller } from 'react-hook-form';
 import styles from './inventoryInputs.module.css';
 
 interface FormValues {
@@ -16,11 +16,11 @@ interface FormValues {
 
 interface InventoryProps {
   control: any;
-  setValue: (name: keyof FormValues, value: any) => void; // Add setValue prop
+  setValue: (name: keyof FormValues, value: any) => void;
   onSubmit: (data: any) => void;
   onBack: () => void;
   selectedVehicleImage?: string;
-  errors: any; // Add errors prop
+  errors: any;
 }
 
 const getBase64 = (file: File): Promise<string> =>
@@ -31,9 +31,9 @@ const getBase64 = (file: File): Promise<string> =>
     reader.onerror = (error) => reject(error);
   });
 
-const InventoryInputs: React.FC<InventoryProps> = ({ control, setValue, onSubmit, onBack, errors }) => {
+const InventoryInputs: React.FC<InventoryProps> = ({ control, setValue, onSubmit, onBack, selectedVehicleImage, errors }) => {
   const [previewOpen, setPreviewOpen] = useState(false);
-  const [previewImage, setPreviewImage] = useState('');
+  const [previewImage, setPreviewImage] = useState(selectedVehicleImage || '');
   const [previewTitle, setPreviewTitle] = useState('');
   const [fileList, setFileList] = useState<File[]>([]);
 
@@ -42,12 +42,10 @@ const InventoryInputs: React.FC<InventoryProps> = ({ control, setValue, onSubmit
     if (files) {
       const newFiles = Array.from(files);
       setFileList((prevList) => [...prevList, ...newFiles]);
-
       // Automatically set preview for the first new file added
       const previewUrl = await getBase64(newFiles[0]);
       setPreviewImage(previewUrl);
       setPreviewTitle(newFiles[0].name);
-
       // Update the form state with the new files using setValue
       setValue('image', [...fileList, ...newFiles]);
     }
@@ -64,8 +62,7 @@ const InventoryInputs: React.FC<InventoryProps> = ({ control, setValue, onSubmit
     const updatedList = fileList.filter(file => file.name !== fileName);
     setFileList(updatedList);
     setValue('image', updatedList); // Update form state to remove the deleted image
-
-    if (updatedList.length === 0) {
+    if (updatedList.length === 0 && !selectedVehicleImage) {
       setPreviewImage('');
       setPreviewTitle('');
       setPreviewOpen(false);
@@ -89,14 +86,13 @@ const InventoryInputs: React.FC<InventoryProps> = ({ control, setValue, onSubmit
         />
         {errors.quantity && <p className={styles.errorText}>{errors.quantity.message}</p>}
       </Form.Item>
-
-      <Form.Item label="Upload Images" required>
+      <Form.Item label="Upload Images">
         <Controller
           name="image"
           control={control}
           rules={{
             validate: (value) => {
-              if (!value || value.length === 0) {
+              if (!selectedVehicleImage && (!value || value.length === 0)) {
                 return "At least one image is required.";
               }
               return true; // Validation passed
@@ -127,6 +123,13 @@ const InventoryInputs: React.FC<InventoryProps> = ({ control, setValue, onSubmit
                     </button>
                   </div>
                 ))}
+                {!fileList.length && selectedVehicleImage && (
+                  <img
+                    src={selectedVehicleImage}
+                    alt="Vehicle Preview"
+                    style={{ width: 100, height: 100, objectFit: 'cover' }}
+                  />
+                )}
                 <div className={styles.uploadBox}>
                   <input
                     type="file"
@@ -144,7 +147,7 @@ const InventoryInputs: React.FC<InventoryProps> = ({ control, setValue, onSubmit
                 </div>
               </div>
               {/* Show error message for images */}
-              {errors.images && <p className={styles.errorText}>{errors.images.message}</p>}
+              {errors.image && <p className={styles.errorText}>{errors.image.message}</p>}
             </div>
           )}
         />
@@ -157,7 +160,6 @@ const InventoryInputs: React.FC<InventoryProps> = ({ control, setValue, onSubmit
           <img alt="Preview" style={{ width: '100%' }} src={previewImage} />
         </Modal>
       </Form.Item>
-
       <Form.Item>
         <Button onClick={onBack} style={{ marginRight: 8 }}>
           Back

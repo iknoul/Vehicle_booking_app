@@ -19,6 +19,20 @@ const modelRegistryMutations = {
             });
             return newVehicleModel;
         },
+        updateModelRegistry: async (_, { id, model, manufacture, type }, { user }) => {
+            
+            if(!user.role === 'admin' ){
+                throw new Error('UnAuthorized, you don`t have access to this route')
+            }
+
+            const updatedVehicleModel = await modelRegistryController.updateModelRegistry(id, {
+                model,
+                manufacture,
+                type,
+            });
+            // return res.status(201).json(updatedVehicle);
+            return updatedVehicleModel;
+        },
         uploadModelRegistryExcel: async (_, { file }, { user }) => {
 
             if(!user.role === 'admin' ){

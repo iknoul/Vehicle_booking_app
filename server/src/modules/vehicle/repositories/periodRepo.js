@@ -6,7 +6,7 @@ const Period = require('../schema/periodModel');
 const TempPeriod = require('../schema/tempPeriodModel');
 const withTransaction = require('../../../helpers/trasnsactionManger'); // Adjust the path as necessary
 const ModelRegistry = require('../schema/modelRegistryModel');
-
+const User = require('../../users/schema/userModel')
 /**
  * Checks if a given date range overlaps with any existing periods for a specific vehicle.
  *
@@ -156,6 +156,77 @@ const getPeriodByUser = async (userId) => {
     } catch (error) {
         console.error('Error fetching user periods:', error.message);
         throw new Error('An error occurred while fetching user periods')
+    }
+};
+
+const getAllPeriods = async () => {
+    try {
+        // Query all periods, with associations for uniqueVehicle, vehicle, model registry, and user
+        const periods = await Period.findAll({
+            include: [
+                {
+                    model: uniqueVehicle,
+                    as: 'uniqueVehicle',
+                    include: [
+                        {
+                            model: Vehicle,
+                            as: 'vehicle',
+                            include: [
+                                {
+                                    model: ModelRegistry,
+                                    as: 'vehicleModel',
+                                },
+                            ],
+                        },
+                    ],
+                },
+                {
+                    model: User, // Include the User model to get user details
+                    as: 'user',
+                },
+            ],
+        });
+
+        if (!periods || periods.length === 0) {
+            return {
+                success: false,
+                message: 'No periods found',
+            };
+        }
+
+        // Format each period with the necessary fields
+        const formattedPeriods = periods.map(period => {
+            const vehicle = period.uniqueVehicle?.vehicle;
+            const vehicleModel = vehicle?.vehicleModel;
+            const user = period.user;
+
+            return {
+                id: period.id,
+                status: period.status,
+                startDate: period.startDate,
+                endDate: period.endDate,
+                uniqueVehicle: {
+                    id: period.uniqueVehicle?.id || null,
+                    vehicle: {
+                        id: vehicle?.id || null,
+                        name: vehicle?.name || null,
+                    },
+                },
+                vehicleModelName: vehicleModel?.model || null, // Assuming `model` is the field for model name
+                vehicleManufacture: vehicleModel?.manufacture || null, // Assuming `manufacture` is the field for manufacturer name
+                vehicleType: vehicleModel?.type || null,
+                user: {
+                    id: user?.id || null,
+                    name: user?.name || null,
+                },
+            };
+        });
+
+        return formattedPeriods;
+
+    } catch (error) {
+        console.error('Error fetching periods for admin:', error.message);
+        throw new Error('An error occurred while fetching all periods');
     }
 };
 
@@ -370,5 +441,6 @@ module.exports = {
     getPeriodsByVehicleId,
     isDateRangeAvailable,
     findAvailableUniqueVehicleWithLowestCount,
-    getPeriodCountByDateAndVehicleModel
+    getPeriodCountByDateAndVehicleModel,
+    getAllPeriods
 };

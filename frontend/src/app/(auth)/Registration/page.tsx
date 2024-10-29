@@ -7,6 +7,7 @@ import { UserDataType } from './types/UserDataType'
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { Alert, message } from 'antd';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/app/hooks/authHooks/useAuth';
 
 
 const PersonalData = lazy(()=>import('./components/PersonalData'))
@@ -29,6 +30,8 @@ const RegistrationInputs: React.FC = () => {
     const { sendOtp, loading, error } = useSendOtp();
     const { verify, loading:otpVerificationLoading, error:otpVerificationError, token } = useVerifyMobile()
     const { createNewUser, loading:createUserLoading, error:createUserError} = useCreateUser()
+    const { isAuthenticated } = useAuth()
+
 
     const key = 'updatable';
 
@@ -97,13 +100,7 @@ const RegistrationInputs: React.FC = () => {
 
     }
 
-    useEffect(()=>{
-        console.log(data, "her")
-    }, [registrationStage])
-
-    useEffect(()=>{
-        console.log(token, 'here the token')
-    }, [token])
+    useEffect (()=>{if(isAuthenticated) router.push('/')}, [])
 
     return (
         <Suspense>

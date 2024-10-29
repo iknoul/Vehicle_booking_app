@@ -10,7 +10,8 @@ async function addOrUpdateVehicleInTypesense(vehicleData) {
     // Convert ID to string (important for Typesense)
     vehicleData.id = vehicleData.id.toString();
     console.log(vehicleData, 'here the vehicle data after id to strinf')
-    await syncVehicleToTypesense(vehicleData); // Sync service that handles data format and upsertion
+    const result  = await syncVehicleToTypesense(vehicleData); // Sync service that handles data format and upsertion
+    console.log(result, 'her inside te typesen')
   } catch (error) {
     console.error('Error syncing vehicle with Typesense:', error);
     throw error; // Re-throw error to be handled by the controller

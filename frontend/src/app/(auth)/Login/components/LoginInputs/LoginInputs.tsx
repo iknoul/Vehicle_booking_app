@@ -1,6 +1,6 @@
 'use client'
 import { Button, message, Spin } from 'antd'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLogin } from '@/app/hooks/authHooks/useLogin'
 import { useAuth } from '@/app/hooks/authHooks/useAuth'
 import {delay} from '@/app/utils/addDelay'
@@ -17,6 +17,7 @@ const LoginInputs:React.FC = ()=>{
 
     const router = useRouter()
     const {verifyOtp, loading, error:logInError} = useLogin()
+    const { isAuthenticated } = useAuth()
     const key = 'updatable';
 
     const [password, setPassword] = useState<string>('')
@@ -70,6 +71,7 @@ const LoginInputs:React.FC = ()=>{
           setLoad(false)
         }
     }
+    useEffect (()=>{if(isAuthenticated) router.push('/')}, [])
 
     return(
     <LoaderContainer isLoading={load} spinner={<></>}>

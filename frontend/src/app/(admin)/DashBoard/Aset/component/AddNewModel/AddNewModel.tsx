@@ -5,7 +5,6 @@ import styles from './addNewModel.module.css';
 interface MyProps {
   isAddVehicleOpen: boolean;
   setSuccess: Function;
-  setFail: Function;
   onCancel: Function;
   vehicleData?: FormValues | null;
   onSubmit: (data: FormValues, onHandleCancel: () => void) => void;
@@ -26,7 +25,7 @@ interface InputField {
   type?: string;
 }
 
-const Types = ["SUV", "HATCH_BACK", "SEDAN"];
+const Types = ["SUV", "HATCH_BACK", "SEDAN", "TRUCK", "Coupe"];
 
 const inputFields: InputField[] = [
   { label: "Model Name", placeholder: "Enter the model name", name: "model", required: true },

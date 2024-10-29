@@ -116,10 +116,10 @@ const updateVehicle = async (id, updatedData) => {
 };
 
 // Delete a vehicle by ID
-const deleteVehicle = async (id) => {
+const deleteVehicle = async (id, transaction) => {
   const vehicle = await Vehicle.findByPk(id);
   if (vehicle) {
-    await vehicle.destroy();
+    await vehicle.destroy({transaction});
     return true;
   }
   return false;

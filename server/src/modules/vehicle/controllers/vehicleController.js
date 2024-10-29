@@ -10,6 +10,7 @@ const { findModelRegistryById } = require('../repositories/modelRegistryResposit
 const uniqueVehicle = require('../schema/uniqueVehicleModel');
 const {hasNoPeriods} = require('../repositories/uniqueVehicleRepo')
 const withTransaction = require('../../../helpers/trasnsactionManger'); // Adjust the path as necessary
+const TempPeriod = require('../schema/tempPeriodModel');
 require('dotenv').config({ path: './../.env' });
 
 const bucketName = 'your-bucket-name'; // MinIO bucket name
@@ -135,79 +136,122 @@ const createVehicle = async ({ name, price, description, quantity, images:imageP
 	}
 };
 
-// Update a vehicle (including image upload handling if necessary)
-const updateVehicle = async (id, updatedVehicleData) => {
-	try {
-		const { images } = updatedVehicleData;
-		// Handle image upload to MinIO if new images are provided
-		if (images && images.length > 0) {
-			const bucketExists = await minioClient.bucketExists(bucketName);
-			if (!bucketExists) {
-				await minioClient.makeBucket(bucketName, 'us-east-1');
-			}
-			const imageUrls = [];
-			for (const img of images) {
-				const imageName = uuidv4() + '.' + img.filename.split('.').pop(); // Use the original file extension
-				const imageStream = img.createReadStream(); // Assuming img is a file stream
-				// Upload the image stream to MinIO
-				await minioClient.putObject(bucketName, imageName, imageStream);
-				const imageUrl = `${minioClient.protocol}//192.168.10.28:9000/${bucketName}/${imageName}`;
-				imageUrls.push(imageUrl);
-			}
-			updatedVehicleData.imageUrl = imageUrls; // Update imageUrl with the new image URLs
-		}
-		// Call the repository method to update the vehicle in the database
-		const updatedVehicle = await vehicleRepository.updateVehicle(id, updatedVehicleData);
-		// Sync updated vehicle with Typesense
-		await addOrUpdateVehicleInTypesense(updatedVehicle);
-		return updatedVehicle;
-	} catch (error) {
-		console.error('Error updating vehicle:', error);
-		throw new Error('Failed to update vehicle');
-	}
+const updateVehicle = async (id, updateVehicleData) => {
+    const { images: imagePromises } = updateVehicleData;
+    console.log('Received images:', imagePromises);
+    console.log('Here the MinIO endpoint:', updateVehicleData);
+    console.log(id, 'here the id');
+
+    try {
+        // Process images
+        const images = await Promise.all(imagePromises);
+        console.log('Here not the problem');
+
+        // Handle image upload to MinIO if new images are provided
+        if (images && images.length > 0) {
+            const bucketExists = await minioClient.bucketExists(bucketName);
+            if (!bucketExists) {
+                await minioClient.makeBucket(bucketName, 'us-east-1');
+            }
+            const imageUrls = [];
+            for (const img of images) {
+                const imageName = uuidv4() + '.' + img.filename.split('.').pop(); // Use the original file extension
+                const imageStream = img.createReadStream(); // Assuming img is a file stream
+
+                // Upload the image stream to MinIO
+                await minioClient.putObject(bucketName, imageName, imageStream);
+                const imageUrl = `${minioClient.protocol}//${process.env.MINIO_END_POINT}:${process.env.MINIO_PORT}/${bucketName}/${imageName}`;
+                imageUrls.push(imageUrl);
+                console.log(imageUrl, "fdgs");
+            }
+            updateVehicleData.image = imageUrls; // Update imageUrl with the new image URLs
+            console.log('Updated image URLs:', updateVehicleData.imageUrl); // Log the updated image URLs
+        }
+
+        // Call the repository method to update the vehicle in the database
+        let updatedVehicle = await vehicleRepository.updateVehicle(id, updateVehicleData);
+        console.log(updatedVehicle, 'here update');
+
+        if (!updatedVehicle) {
+            throw new Error(`Vehicle update failed for id ${id}`);
+        }
+
+        if (updateVehicleData.modelId) {
+            // Fetch model details
+            const modelDetails = await findModelRegistryById(updateVehicleData.modelId);
+            if (!modelDetails) {
+                throw new Error(`Model details not found for id ${updateVehicleData.modelId}`);
+            }
+            delete modelDetails.dataValues.id;
+            updatedVehicle = { ...updatedVehicle, ...modelDetails };
+        }
+
+        // Sync updated vehicle with Typesense
+        await addOrUpdateVehicleInTypesense({ ...updatedVehicle.dataValues, id }); // Ensure the `id` is included in the JSON body
+        console.log('actually here the problem is ...`');
+
+        return { success: true, message: "Vehicle updated successfully" };
+    } catch (error) {
+        console.error('Error updating vehicle:', error);
+        throw new Error('Failed to update vehicle');
+    }
 };
 
-// Delete a vehicle by ID
-	const deleteVehicle = async (id) => {
-	try {
-		// Use withTransaction to ensure atomicity
-		await withTransaction(async (transaction) => {
-			// Find all unique vehicles associated with the vehicle
-			const uniqueVehicles = await uniqueVehicle.findAll({
-				where: { vehicleId: id },
-				transaction, // Include transaction here
-			});
-			// Check if all unique vehicles have no periods or temp periods
-			const allHaveNoPeriods = await Promise.all(
-				uniqueVehicles.map(async (uniqueVehicle) => {
-					return await hasNoPeriods(uniqueVehicle.id, transaction); // Pass the transaction to hasNoPeriods
-				})
-			);
-			// If any unique vehicle has associated periods, throw an error
-			if (allHaveNoPeriods.includes(false)) {
-				throw new Error('Cannot delete the vehicle as some unique vehicles have associated periods.');
-			}
 
-			// Delete all unique vehicles associated with the vehicle
-			await uniqueVehicle.destroy({
-				where: { vehicleId: id },
-				transaction, // Include transaction here
-			});
 
-			// Delete the vehicle itself
-			const isDeleted = await vehicleRepository.deleteVehicle(id, transaction); // Pass the transaction to the deleteVehicle method
-			if (isDeleted) {
-				await typesenseClient.collections('vehicles').documents(id).delete();
-				return { success: true, message: 'Vehicle deleted successfully' };
-			} else {
-				throw new Error('Vehicle not found');
-			}
-      	});
-	} catch (error) {
-		console.error(`Error deleting vehicle with ID ${id}:`, error);
-		throw new Error('Failed to delete vehicle');
-	}
+
+
+
+// delete the vehicle if there is no current period associated with it
+const deleteVehicle = async (id) => {
+    try {
+        const result = await withTransaction(async (transaction) => {
+            console.log('Initiating delete process for vehicle ID:', id);
+
+            const uniqueVehicles = await uniqueVehicle.findAll({ where: { vehicleId: id }, transaction });
+            console.log('Unique vehicles associated with vehicle ID:', id, uniqueVehicles);
+
+            const allHaveNoPeriods = await Promise.all(uniqueVehicles.map(async (uniqueVehicle) => {
+                return await hasNoPeriods(uniqueVehicle.id, transaction);
+            }));
+            console.log('Checked for periods:', allHaveNoPeriods);
+
+            if (allHaveNoPeriods.includes(false)) {
+                throw new Error('Cannot delete the vehicle as some unique vehicles have associated periods.');
+            }
+
+            console.log('Deleting TempPeriods associated with unique vehicles...');
+            await TempPeriod.destroy({ where: { uniqueVehicleId: uniqueVehicles.map(uv => uv.id) }, transaction });
+
+            console.log('Deleting unique vehicles...');
+            await uniqueVehicle.destroy({ where: { vehicleId: id }, transaction });
+
+            console.log('Unique vehicles associated with vehicle ID after deletion:', id, await uniqueVehicle.findAll({ where: { vehicleId: id }, transaction }));
+
+            console.log('Deleting main vehicle entry...');
+            const isDeleted = await vehicleRepository.deleteVehicle(id, transaction);
+
+            if (isDeleted) {
+                console.log('Deleting from Typesense...');
+                const deleteResult = await typesenseClient.collections('vehicles').documents(id).delete();
+                console.log(deleteResult, 'Vehicle deleted successfully.');
+                return { success: true, message: 'Vehicle deleted successfully' };
+            } else {
+                throw new Error('Vehicle not found');
+            }
+        });
+
+        // Logging result outside the transaction
+        console.log(result, 'Result before return');
+        return result;
+    } catch (error) {
+        console.error(`Error deleting vehicle with ID ${id}:`, error);
+        throw new Error('Failed to delete vehicle');
+    }
 };
+
+
+
 module.exports = {
 	getAllVehicles,
 	getVehicleById,

@@ -2,6 +2,7 @@
 import { useState } from 'react'
 import styles from './sideBar.module.css'
 import { usePathname, useRouter } from 'next/navigation'
+import { useAuth } from '@/app/hooks/authHooks/useAuth'
 
 interface MyProps{
    
@@ -34,22 +35,25 @@ const SideBar:React.FC <MyProps>= ({})=>{
     const router = useRouter();
 
     const [isSideBarMax, setIsSideBarMax] = useState(true)
+    const { logout } = useAuth();
+
     
     const handleSideBarSize = ()=>{
         setIsSideBarMax((prevState) => !prevState)
     }
     const pathname = usePathname(); // Get the current route
 
+    const handleLogout = () => logout()
 
     return(
         <div className={`${styles.sideBar} ${isSideBarMax?styles.sideBarMax:''}`}>
+
             <div className={styles.sideBarHead} onClick={handleSideBarSize}>
-                <i className={`fa-solid fa-angles-left  ${styles.iconItem}`}></i>
+                <i className={`fa-solid fa-angles-left  ${styles.iconItem}`} />
             </div>
-            
-            {
-                SideBarItems.map((item, index)=>{
-                    const isActive = pathname === item.href;
+                
+            {SideBarItems.map((item, index)=>{
+                const isActive = pathname === item.href;
                 return(
                     <div 
                         key={index} 
@@ -57,15 +61,20 @@ const SideBar:React.FC <MyProps>= ({})=>{
                         onClick={() => router.push(item.href)}
                     >
                         <i className={`${item.icon} ${isSideBarMax?'':''}`}></i>
-                        {isSideBarMax &&
-                            <p>{item.label}</p>
-                        }
+                        {isSideBarMax && <p> {item.label} </p> }
                     </div>
                 )
-                })
+            })
             }
-        </div>)
-    
+            <div className={`${styles.sideBarItem}`} onClick={handleLogout} > 
+
+                <i className={`fa-solid fa-right-from-bracket fa-xl ${isSideBarMax?'':''}`} />
+
+                { isSideBarMax && <p>Logout</p> }
+            
+            </div>
+        </div>
+    )    
 }
 
 export default SideBar

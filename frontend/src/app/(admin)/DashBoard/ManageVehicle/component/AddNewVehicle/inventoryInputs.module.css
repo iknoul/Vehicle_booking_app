@@ -1,13 +1,16 @@
-.imagePreviewContainer{
+.imageInputContainer{
     display: flex;
+    flex-direction: column;
     flex-wrap: wrap;
     gap: 8px;
 }
-.imagePreviewContainer img{
-    object-fit: cover;
-}
-.imagePreviewContainer input{
+
+.imageInputContainer input{
     display: none;
+}
+.imagePreviewContainer{
+  display: flex;
+  gap: 16px;
 }
 .uploadBox {
     border: 2px dashed #d9d9d9;
@@ -25,14 +28,16 @@
     cursor: pointer;
   }
 
-
   .imagePreview {
     position: relative;
     width: 100px;
     height: 100px;
     cursor: pointer;
   }
-
+  .imagePreview img{
+    width: 100%;
+    object-fit: contain !important;
+  }
   .removeIcon {
     position: absolute;
     top: 4px;
@@ -44,7 +49,9 @@
   }
 
   .removeIcon:hover {
-    background: rgba(255, 0, 0, 0.7);
+    /* background: rgba(255, 0, 0, 0.7); */
+    background: rgba(255, 255, 255, 0.352);
+
   }
 
   .removeIcon svg {
@@ -52,3 +59,34 @@
     height: 16px;
     color: #ff4d4f;
   }
+  .textarea {
+    resize: vertical;
+  }
+  
+  .errorText {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+  }
+  .button.primary {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .button.primary:hover {
+    background-color: #0056b3;
+  }
+  
+  .button.secondary {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .button.secondary:hover {
+    background-color: #565e64;
+  }
+  

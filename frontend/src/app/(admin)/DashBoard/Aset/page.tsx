@@ -1,19 +1,19 @@
 'use client'
 
 import React, { Suspense, lazy } from 'react';
-import { useRouter } from "next/navigation";
-import { Button, FloatButton, Table, Spin, Alert, Skeleton, Image, message } from 'antd';
+import { Button, FloatButton, Table, Spin, Skeleton, message } from 'antd';
 import type { TableColumnsType, TableProps } from 'antd';
 import { useEffect, useState } from "react";
 import { useFetchVehicleModels } from '@/app/hooks/vehicleHooks/useFetchVehiclesModel';
 import { useDeleteVehicleModel } from '@/app/hooks/vehicleHooks/useDeleteVehicleModel';
-import styles from './aset.module.css';
 import LoaderContiner from '@/app/components/LoaderContainer';
 import Loader from '@/app/components/Loader';
 import { delay } from '@/app/utils/addDelay';
 import { useCreateVehicleModel } from '@/app/hooks/vehicleHooks/useCreateVehicleModel';
 import { useUpdateVehicleModel } from '@/app/hooks/vehicleHooks/useUpdateVehicleModel';
 import { useUploadExcelFile } from '@/app/hooks/vehicleHooks/useUploadExcelFile';
+import styles from './aset.module.css';
+
 
 const AddNewModel = lazy(() => import('./component/AddNewModel/AddNewModel'));
 const AddNewVehicleFromExcel = lazy(() => import('./component/AddVehicleFromExcel/AddVehicleFromExcel'));
@@ -31,9 +31,6 @@ const DashBoard = () => {
     const [isAddVehicleFromExcelOpen, setIsAddVehicleFromExcelOpen] = useState<boolean>(false);
     const [selectedVehicle, setSelectedVehicle] = useState<DataType | null>(null);
     const [succes, setSucces] = useState(false)
-    const [fail, setFail] = useState(false)
-    const [isLoading, setIsLoading]  = useState<boolean>(true)
-    const router = useRouter();
 
     const { vehicleModels, loading: vehiclesLoading, refetch, error: fetchError } = useFetchVehicleModels();
     const { removeVehicleModel, loading: deleteLoading, error: deleteError } = useDeleteVehicleModel();
@@ -108,7 +105,6 @@ const DashBoard = () => {
     
     // handle the manual uploading of vehicle model data
     const onSubmit = async (data: FormValues, onHandleCancel: Function) => {
-        setIsLoading(true);
         try {
             if (data.id) {
                 await updateExistingVehicleModel({ id: data.id, model: data.model, type: data.type, manufacture: data.manufacture });
@@ -122,12 +118,9 @@ const DashBoard = () => {
 
         } catch (error) {
             message.error({content:`Error ${data.id?'updating':'adding'} vehicle-model`});
-            setFail(true);
-            setTimeout(() => { setFail(false); }, 2000);
           console.error('Error creating vehicle-model:', error);
         } finally {
             onHandleCancel();
-            setIsLoading(false);
         }
     };
     
@@ -213,10 +206,8 @@ const DashBoard = () => {
                     isAddVehicleOpen={isAddVehicleOpen} 
                     onCancel={onCancel} 
                     vehicleData={selectedVehicle}
-                    setSuccess={setSucces}
-                    setFail={setFail}
+                    setSuccess={setSucces}  
                     onSubmit={onSubmit}
-                    // Pass the selected vehicle data
                 />
             </Suspense>
            }

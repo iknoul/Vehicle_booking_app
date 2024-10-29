@@ -1,0 +1,41 @@
+.tableContainer {
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .ant-table {
+    background-color: white;
+  }
+  
+  .ant-table-thead > tr > th {
+    background-color: #007bff;
+    color: white;
+    font-weight: bold;
+  }
+  
+  .ant-table-tbody > tr > td {
+    padding: 16px;
+    vertical-align: middle;
+  }
+  
+  .ant-table-tbody > tr.ant-table-row:hover > td {
+    background-color: #f1f1f1;
+  }
+  
+  .inHand {
+    color: green;
+    font-weight: bold;
+  }
+  
+  .booked {
+    color: orange;
+    font-weight: bold;
+  }
+  
+  .completed {
+    color: blue;
+    font-weight: bold;
+  }
+  

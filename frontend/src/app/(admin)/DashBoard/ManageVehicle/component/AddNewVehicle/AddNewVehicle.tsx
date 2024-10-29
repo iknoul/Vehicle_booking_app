@@ -1,9 +1,6 @@
-// AddNewVehicle.tsx
 import React, { lazy, Suspense, useEffect, useState } from "react";
-import { Modal, Spin } from "antd";
-import { useCreateVehicle } from '@/app/hooks/vehicleHooks/useCreateVehicle';
-import { useUpdateVehicle } from '@/app/hooks/vehicleHooks/useUpdateVehicle';
-import { useForm } from "react-hook-form";
+import { Modal } from "antd";
+import { useForm, Controller } from "react-hook-form";
 
 const InventoryInputs = lazy(() => import("./InventoryInputs"));
 const IdentificationInputs = lazy(() => import("./IdentificationInputs"));
@@ -14,7 +11,9 @@ interface MyProps {
   setFail: Function;
   onCancel: Function;
   vehicleData?: VehicleData;
+  onSubmit: Function;
 }
+
 interface FormValues {
   id?: string;
   key: string;
@@ -25,6 +24,7 @@ interface FormValues {
   description: string;
   quantity: number;
 }
+
 interface VehicleData {
   id: string;
   key: string;
@@ -36,11 +36,11 @@ interface VehicleData {
   quantity: number;
 }
 
-const AddNewVehicle: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleData, setSuccess, setFail }) => {
+const AddNewVehicle: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleData, onSubmit }) => {
   const [currentStep, setCurrentStep] = useState(1);
   const { control, setValue, handleSubmit, reset, watch, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
-      key: '',
+      key: 'defaultKey',
       model: '',
       name: '',
       price: 0,
@@ -51,32 +51,13 @@ const AddNewVehicle: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleD
   });
 
   const image = watch('image');
-  const { createNewVehicle, loading: createVehiclesLoading } = useCreateVehicle();
-  const { updateExistingVehicle, loading: updateVehiclesLoading } = useUpdateVehicle();
 
   const handleNext = (data: FormValues) => {
     setCurrentStep(2);
   };
 
-  const handleFormSubmit = async (data: FormValues) => {
-    console.log(data, 'here i print the form data')
-    try {
-      if (vehicleData?.id) {
-        await updateExistingVehicle({
-          id: vehicleData.id,
-          ...data,
-        });
-      } else {
-        await createNewVehicle(data);
-      }
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 2000);
-    } catch (error) {
-      setFail(true);
-      console.error("Error saving vehicle:", error);
-    } finally {
-      onCancel();
-    }
+  const handleFormSubmit = (data: FormValues) => {
+    onSubmit(data, vehicleData?.id);
   };
 
   const onHandleCancel = () => {
@@ -90,7 +71,7 @@ const AddNewVehicle: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleD
         reset({ ...vehicleData, image: [] });
       } else {
         reset({
-          key: '',
+          key: 'defaultKey',
           model: '',
           name: '',
           price: 0,
@@ -103,10 +84,6 @@ const AddNewVehicle: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleD
     }
   }, [isAddVehicleOpen, vehicleData, reset]);
 
-  useEffect(() => {
-    console.log(image, 'here the image input');
-  }, [image]);
-
   return (
     <Modal
       open={isAddVehicleOpen}
@@ -115,25 +92,23 @@ const AddNewVehicle: React.FC<MyProps> = ({ isAddVehicleOpen, onCancel, vehicleD
       footer={null}
     >
       <Suspense fallback={<p>loading ..</p>}>
-        <Spin tip="Loading" spinning={createVehiclesLoading || updateVehiclesLoading}>
-          {currentStep === 1 && (
-            <IdentificationInputs
-              control={control}
-              onNext={handleSubmit(handleNext)}
-              errors={errors}
-            />
-          )}
-          {currentStep === 2 && (
-            <InventoryInputs
-              selectedVehicleImage={vehicleData?.image[0]}
-              control={control}
-              onSubmit={handleSubmit(handleFormSubmit)}
-              onBack={() => setCurrentStep(1)}
-              errors={errors}
-              setValue={setValue}
-            />
-          )}
-        </Spin>
+        {currentStep === 1 && (
+          <IdentificationInputs
+            control={control}
+            onNext={handleSubmit(handleNext)}
+            errors={errors}
+          />
+        )}
+        {currentStep === 2 && (
+          <InventoryInputs
+            selectedVehicleImage={vehicleData?.image[0]}
+            control={control}
+            onSubmit={handleSubmit(handleFormSubmit)}
+            onBack={() => setCurrentStep(1)}
+            errors={errors}
+            setValue={setValue}
+          />
+        )}
       </Suspense>
     </Modal>
   );

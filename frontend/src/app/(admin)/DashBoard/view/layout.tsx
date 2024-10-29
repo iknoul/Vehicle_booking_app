@@ -12,11 +12,11 @@ const pages = [
     href: '/DashBoard/view/BookPerVehicle',
   },
   {
-    label: 'New user',
-    href: '/DashBoard/view/NewUser',
+    label: 'Bookings Table',
+    href: '/DashBoard/view/BookingsTable',
   },
   {
-    label: 'Another Page',
+    label: 'New User',
     href: '/DashBoard/view/AnotherPage',
   },
 ];

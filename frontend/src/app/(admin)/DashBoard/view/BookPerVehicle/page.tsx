@@ -3,6 +3,7 @@ import { lazy, Suspense } from "react";
 import { Spin } from "antd";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { useFetchPeriodByDate } from "@/app/hooks/adminHooks/useFetchPeriodByDate";
+import styles from './bookPerVehicle.module.css'; // Import styles
 
 // Lazy load D3Chart component
 const BookingsChart = lazy(() => import('../components/D3Chart/D3Chart'));
@@ -15,6 +16,7 @@ interface PeriodData {
 
 const DashBoard = () => {
   const { periodData, loading } = useFetchPeriodByDate();
+
   if (loading) {
     return <Spin />;
   }
@@ -34,8 +36,8 @@ const DashBoard = () => {
   const carModels = Array.from(new Set(periodData.map(item => item.carModel)));
 
   return (
-    <div>
-      {/* <h3>Bookings Chart</h3> */}
+    <div className={styles.container}>
+      <h2 className={styles.title}>Bookings Chart</h2>
       <Suspense fallback={<Spin />}>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart

@@ -41,17 +41,17 @@ const vehicleMutations = {
         quantity,
         images: image,  // Array of image URLs
       });
-      // return res.status(201).json(updatedVehicle);
+      // return res.status(201).json(updatedVehicle)
+      console.log(updatedVehicle, 'updatedVehicle inside the veiclemuations');
       return updatedVehicle;
     },
     deleteVehicle: async (_, { id }, { user }) => {
-
       if(!user.role === 'admin' ){
         throw new Error('UnAuthorized, you don`t have access to this route')
       }
-
-      const result = await vehicleController.deleteVehicle(id);
-      return result;
+      const  result = await vehicleController.deleteVehicle(id);
+      console.log(result, "heret he reuslt before return")
+      return result
     },
   },
 };

@@ -27,7 +27,7 @@ export const UPDATE_VEHICLE_MUTATION = gql`
     $id: ID!,
     $name: String,
     $modelId: String,
-    $image: [String],
+    $image: [Upload],
     $price: Float,
     $description: String,
     $quantity: Int
@@ -41,13 +41,8 @@ export const UPDATE_VEHICLE_MUTATION = gql`
       description: $description,
       quantity: $quantity
     ) {
-      id
-      name
-      modelId
-      price
-      description
-      quantity
-      image
+      success
+		  message
     }
   }
 `;

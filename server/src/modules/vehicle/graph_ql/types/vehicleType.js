@@ -11,6 +11,10 @@ const vehicleType = gql`
 		type: String
 		manufacture: String
 	}
+	type UserBrief {
+		id : String
+		name : String
+	}
 
 	type Vehicle {
 		id: ID!
@@ -23,12 +27,30 @@ const vehicleType = gql`
 		description: String
 		quantity: Int
 	}
+	type VehicleBrief {
+		name: String
+	}
+	type UniqueVehicleBrief {
+		id: String
+		vehicle: VehicleBrief
+	}
 	type PeroidByDateResponse {
 		createdDate: String,
         PeriodCount: Int,
         carModel: String,
 	}
-	type DeleteResponse {
+	type AllPeroidsResponse {
+		id : ID
+		status: String
+		startDate : String
+		endDate : String
+		uniqueVehicle : UniqueVehicleBrief
+		vehicleModelName : String
+		vehicleManufacture: String
+		vehicleType: String
+		user : UserBrief
+	}
+	type SuccessResponse {
 		success: Boolean!
 		message: String!
 	}
@@ -37,6 +59,7 @@ const vehicleType = gql`
 		vehicles(model: String, minPrice: Float, maxPrice: Float, startDate: String, endDate: String, limit: Int, filter: Boolean): [Vehicle]
 		vehicle(id: ID!): Vehicle
 		PeroidByDate: [PeroidByDateResponse]
+		allPeriods: [AllPeroidsResponse]
 	}
 
 	extend type Mutation {
@@ -52,11 +75,11 @@ const vehicleType = gql`
 		id: ID!,
 		name: String,
 		modelId: String,
-		image: [Upload!],  # Optional to handle multiple images
+		image: [Upload],  # Optional to handle multiple images
 		price: Float, 
 		description: String, 
 		quantity: Int
-		): Vehicle
-	deleteVehicle(id: ID!): DeleteResponse
+		): SuccessResponse
+	deleteVehicle(id: ID!): SuccessResponse
 }`;
 module.exports = vehicleType;

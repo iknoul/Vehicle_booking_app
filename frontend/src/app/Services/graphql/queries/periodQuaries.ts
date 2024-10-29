@@ -28,3 +28,27 @@ export const FETCH_PERIOD_BY_DATE_QUERY = gql`
     }
   }
 `;
+
+export const FETCH_ALL_PERIODS_QUERY = gql`
+  query Periods {
+    allPeriods {
+      id
+      status
+      startDate
+      endDate
+      uniqueVehicle {
+        id
+        vehicle {
+          name
+        }
+      }
+      vehicleModelName
+      vehicleManufacture
+      vehicleType
+      user {
+        id
+        name
+      }
+    }
+  }
+`;
