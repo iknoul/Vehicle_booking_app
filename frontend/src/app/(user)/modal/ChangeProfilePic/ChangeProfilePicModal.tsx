@@ -10,9 +10,10 @@ const key = 'updatable';
 interface ChangeProfilePicModalProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
+  refetch : Function
 }
 
-const ChangeProfilePicModal: React.FC<ChangeProfilePicModalProps> = ({ isOpen, setIsOpen }) => {
+const ChangeProfilePicModal: React.FC<ChangeProfilePicModalProps> = ({ isOpen, setIsOpen, refetch }) => {
   const { triggerChangeProfilePic, loading: changePicLoading } = useChangeProfilePic();
 
   const [fileList, setFileList] = useState<UploadFile[]>([]); // Correctly typed as UploadFile[]
@@ -29,6 +30,8 @@ const ChangeProfilePicModal: React.FC<ChangeProfilePicModalProps> = ({ isOpen, s
     try {
       await triggerChangeProfilePic(file);
       message.success({ content: 'Profile picture updated successfully', key });
+      await refetch()
+      setFileList([])
       setIsOpen(false); // Close the modal after successful update
     } catch (error) {
       console.error(error);

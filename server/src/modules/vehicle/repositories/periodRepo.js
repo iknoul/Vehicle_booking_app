@@ -328,6 +328,40 @@ const updatePeriodStatusToInHand = async () => {
         throw new Error('Failed to update period status');
     }
 };
+const updatePeriodStatusReturned = async () => {
+    try {
+        // Get the current date
+        const currentDate = new Date();
+
+        // Find all periods where the start date has arrived or passed, and the status is still "Booked"
+        const periodsToUpdate = await Period.findAll({
+            where: {
+                endDate: {
+                    [Sequelize.Op.lte]: currentDate, // Check if start date is less than or equal to the current date
+                },
+                status: 'In Hand', // Only update periods that are currently "Booked"
+            },
+        });
+
+        // If no periods found, return without updating
+        if (periodsToUpdate.length === 0) {
+            console.log('No periods found to update');
+            return;
+        }
+
+        // Update each period's status to "In Hand"
+        for (const period of periodsToUpdate) {
+            await period.update({ status: 'Returned' });
+        }
+
+        console.log(`${periodsToUpdate.length} periods updated to "Returned"`);
+
+    } catch (error) {
+        console.error('Error updating periods to "Returned":', error);
+        throw new Error('Failed to update period status');
+    }
+};
+
 
 const getPeriodById = async (id) => {
     return await Period.findByPk(id);
@@ -435,6 +469,7 @@ module.exports = {
     createPeriod,
     getPeriodByUser,
     updatePeriodStatusToInHand,
+    updatePeriodStatusReturned,
     getPeriodById,
     updatePeriod,
     deletePeriod,

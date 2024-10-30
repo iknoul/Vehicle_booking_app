@@ -1,7 +1,7 @@
 // scheduler.js
 
 const cron = require('node-cron');
-const { updatePeriodStatusToInHand } = require('../modules/vehicle/repositories/periodRepo');
+const { updatePeriodStatusToInHand, updatePeriodStatusReturned } = require('../modules/vehicle/repositories/periodRepo');
 
 // Existing cron job (if any)
 // cron.schedule('*/5 * * * *', async () => {
@@ -13,7 +13,8 @@ const { updatePeriodStatusToInHand } = require('../modules/vehicle/repositories/
 cron.schedule('0 0 * * *', async () => {
     try {
         console.log('Running nightly scheduled task to update period status...');
-        await updatePeriodStatusToInHand();
+        await updatePeriodStatusToInHand()
+        await updatePeriodStatusReturned()
         console.log('Nightly period status update completed.');
     } catch (error) {
         console.error('Error running nightly scheduled task:', error);

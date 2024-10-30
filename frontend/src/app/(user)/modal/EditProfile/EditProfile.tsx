@@ -22,10 +22,12 @@ const formItems = [
 interface PersonalDataProps {
   setIsOpen: Function;
   isOpen: boolean;
-  userData: FormValues;
+  userData: FormValues
+  refetch : Function
+
 }
 
-const PersonalData: React.FC<PersonalDataProps> = ({ setIsOpen, isOpen, userData }) => {
+const PersonalData: React.FC<PersonalDataProps> = ({ setIsOpen, isOpen, userData, refetch:refetchUserData }) => {
   const { Option } = Select;
   const { control, handleSubmit, formState: { errors }, setValue, watch } = useForm<FormValues>({
     defaultValues: { name: '', pinCode: '', city: '' },
@@ -70,6 +72,7 @@ const PersonalData: React.FC<PersonalDataProps> = ({ setIsOpen, isOpen, userData
       try {
         await editUser({...updatedFields, id:userData.id});
         alert('Profile updated successfully');
+        await refetchUserData()
         setIsOpen(false);
       } catch (error) {
         console.error(error);

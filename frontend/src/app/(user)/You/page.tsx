@@ -1,5 +1,5 @@
 'use client'
-import React, { lazy, useState, Suspense } from 'react';
+import React, { lazy, useState, Suspense, useEffect } from 'react';
 import { useAuth } from '@/app/hooks/authHooks/useAuth';
 import { useFetchUserProfile } from '@/app/hooks/userHooks/useFetchUserProfile';
 import {Empty} from 'antd'
@@ -27,8 +27,7 @@ const UserDashboard: React.FC = () => {
   const { userProfile, loading, error, refetch } = useFetchUserProfile(userId);
 
   const [page, setPage] = useState<'bookings' | 'profile' | 'changePassword' | 'terms' | 'privacyPolicy'>('bookings')
-  
-
+ 
   // If the data is still loading, show a skeleton or loading message
   if (loading) {
     return <Skeleton active />;
@@ -59,7 +58,7 @@ const UserDashboard: React.FC = () => {
             </h3>
           </div>
           {page == 'profile'&&        
-            <Profile />
+            <Profile refetch={refetch}/>
           }
           {page == 'bookings' &&
             <BookingTable />

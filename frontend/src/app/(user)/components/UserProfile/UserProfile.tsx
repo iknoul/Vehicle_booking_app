@@ -1,10 +1,12 @@
-import { lazy, useState } from 'react';
+import { lazy, useEffect, useState } from 'react';
 import { useAuth } from '@/app/hooks/authHooks/useAuth';
 const EditProfile = lazy(()=> import('../../modal/EditProfile/EditProfile'))
 const ChangeProfilePicModal = lazy(()=> import('../../modal/ChangeProfilePic/changeProfilePicModal'))
 
 import styles from './userProfile.module.css';
 import Image from 'next/image';
+import { useFetchUserProfile } from '@/app/hooks/userHooks/useFetchUserProfile';
+import { Empty } from 'antd';
 
 interface UserProfile {
   id: string;
@@ -17,14 +19,16 @@ interface UserProfile {
 }
 
 interface UserProfileProps {
-  userProfile: UserProfile;
+  refetch :Function
 }
 
-const UserProfile: React.FC<UserProfileProps> = ({ userProfile }) => {
-  const { logout } = useAuth();
+const UserProfile: React.FC<UserProfileProps> = ({refetch: refetchUserData}) => {
+
+  const { userId } = useAuth();
+
+  const { userProfile, loading, error, refetch } = useFetchUserProfile(userId);
   const [isEdit, setIsEdit] = useState(false);
   const [isPorfileChangeOpen, setIsProfileChangeOpen] = useState(false)
-  const [profilePic, setProfilePic] = useState(userProfile.profilePic);
   
   const handleEditClick = () => {
     setIsEdit(!isEdit);
@@ -32,6 +36,18 @@ const UserProfile: React.FC<UserProfileProps> = ({ userProfile }) => {
   const handleProfileEditClick = () => {
     setIsProfileChangeOpen(!isPorfileChangeOpen);
   };
+  const handleRefetch = () => {
+    refetchUserData()
+    refetch()
+  }
+  
+  if (!userProfile) {
+    return (
+      <div className={`${styles.container} ${styles.noData}`}>
+        <Empty description={<p>User profile not available.</p>} />
+      </div>
+    );
+  }
 
   return (
     <div className={styles.userProfile}>
@@ -45,11 +61,16 @@ const UserProfile: React.FC<UserProfileProps> = ({ userProfile }) => {
         isOpen={isEdit}
         userData={userProfile}
         setIsOpen={setIsEdit}
+        refetch = {handleRefetch}
       />
-      
+       <ChangeProfilePicModal 
+          isOpen={isPorfileChangeOpen}
+          setIsOpen={setIsProfileChangeOpen}
+          refetch = {handleRefetch}
+      />
       <div className={styles.profileImage}>
-        {profilePic ? (
-          <Image src={profilePic} width={100} height={100} alt="User" className={styles.userImage} />
+        {userProfile.profilePic ? (
+          <Image src={userProfile.profilePic} width={100} height={100} alt="User" className={styles.userImage} />
         ) : (
           <p>No profile image available</p>
         )}
@@ -59,10 +80,6 @@ const UserProfile: React.FC<UserProfileProps> = ({ userProfile }) => {
           onClick={handleProfileEditClick}
       />
       </div>
-      <ChangeProfilePicModal 
-          isOpen={isPorfileChangeOpen}
-          setIsOpen={setIsProfileChangeOpen}
-      />
     </div>
   );
 };
