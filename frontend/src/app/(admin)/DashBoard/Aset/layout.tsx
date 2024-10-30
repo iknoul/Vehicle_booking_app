@@ -1,7 +1,4 @@
-
 import NavBar from '../../../theme/NavBar/NavBar';
-
-
 import styles from './layout.module.css'
 
 interface LayoutProps {
@@ -9,24 +6,22 @@ interface LayoutProps {
 }
 
 const pages = [
-  {
-      label: 'Manage Vehicle',
-      href: '/DashBoard/ManageVehicle',
-  },
-  {
-      label: 'import data from Excel',
-      href: '/DashBoard/view/BookPerVehic',
-  },
+	{
+		label: 'Manage Vehicle',
+		href: '/DashBoard/ManageVehicle',
+	},
+	{
+		label: 'import data from Excel',
+		href: '/DashBoard/view/BookPerVehic',
+	},
 ];
 const Layout: React.FC<LayoutProps> = ({ children }) => {
 
-  return (
-    <>
-
-		{children}
-			
-	</>
-  );
+	return (
+		<>
+			{children}		
+		</>
+	);
 };
 
 export default Layout;

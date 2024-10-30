@@ -10,7 +10,7 @@ interface Adress {
 }
 
 interface UseFetchAdressResult {
-  adress: Adress;
+  address: Adress;
   loading: boolean;
   error: any;  // Adjust based on the error type
   refetch: (variables?: any) => void;  // Add refetch function to the return type
@@ -32,7 +32,7 @@ export const useFetchAdress = (pinCode: string): UseFetchAdressResult => {
   return {
     loading,
     error,
-    adress: data?.fetchAdress || null,
+    address: data?.fetchAdress || null,
     refetch,  // Return refetch function
   };
 };

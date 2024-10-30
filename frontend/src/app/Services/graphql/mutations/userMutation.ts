@@ -25,11 +25,6 @@ export const CREATE_USER_MUTATION = gql`
   }
 `;
 
-
-// email
-// mobile
-// profilePic
-
 export const DELETE_USER_MUTATION = gql`
   mutation DeleteUser($id: ID!) {
     deleteUser(id: $id) {
@@ -41,24 +36,49 @@ export const DELETE_USER_MUTATION = gql`
 
 export const UPDATE_USER_MUTATION = gql`
   mutation UpdateUser(
-    $id: ID!,
     $name: String,
-    $email: String,
-    $mobile: String,
-    $profilePic: [String]
+    $profilePic: Upload,
+    $pinCode: String,
+    $city: String,
   ) {
     updateUser(
-      id: $id,
       name: $name,
-      email: $email,
-      mobile: $mobile,
-      profilePic: $profilePic
+      profilePic: $profilePic,
+      pinCode: $pinCode,
+      city: $city,
     ) {
-      id
-      name
-      email
-      mobile
-      profilePic
+      success
+      message
+    }
+  }
+`;
+// Send OTP Mutation
+export const SEND_OTP_MUTATION = gql`
+  mutation CheckOtp {
+    checkotp {
+      success
+      message
+    }
+  }
+`;
+
+// Verify OTP Mutation
+export const VERIFY_OTP_MUTATION = gql`
+  mutation ConfirmOtp($otp: String!) {
+    confirmOtp(otp: $otp) {
+      success
+      message
+      token
+    }
+  }
+`;
+
+// Change Password Mutation
+export const CHANGE_PASSWORD_MUTATION = gql`
+  mutation ChangePassword($token: String!, $newPassword: String!) {
+    changePassword(token: $token, newPassword: $newPassword) {
+      success
+      message
     }
   }
 `;

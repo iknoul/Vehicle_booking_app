@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import styles from './profileSideBar.module.css'
-import { pages } from 'next/dist/build/templates/app-page';
 
 
 
@@ -15,6 +14,12 @@ const sideBarItems = [
         label: 'Bookings',
         icon: 'fa-solid fa-clock-rotate-left',
         path: 'bookings' as string
+
+    },
+    {
+        label: 'Change Passwrod',
+        icon: 'fa-solid fa-clock-rotate-left',
+        path: 'changePassword' as string
 
     },
     {

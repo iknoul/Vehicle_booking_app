@@ -40,7 +40,6 @@ const userType = gql`
 		id: String
 		vehicle: VehicleBrief
 	}
-	
 	type Period{
 		id : ID
 		status: String
@@ -50,6 +49,11 @@ const userType = gql`
 		vehicleModelName : String
 		vehicleManufacture: String
 		vehicleType: String
+	}
+	type SuccessResponse {
+		success: Boolean!
+		message: String!
+		token: String
 	}
 
 	extend type Query {
@@ -63,19 +67,18 @@ const userType = gql`
 	extend type Mutation {
 		createUser(
 			name: String!, 
-			mobile: String,
-			email: String,
-			password: String,
+			mobile: String!,
+			email: String!,
+			password: String!,
 			profilePic: Upload,  # Use [String] for multiple image URLs
-			token: String,
+			token: String!,
 		): User
 		updateUser(
-			name: String!, 
-			mobile: String,
-			email: String,
-			password: String,
-			profilePic: [Upload],  # Use [String] for multiple image URLs
-		): User
+			name: String, 
+			pinCode: String,
+    		city: String,
+			profilePic: Upload,  # Use [String] for multiple image URLs
+		): SuccessResponse
 		deleteUser(id: ID!): DeleteResponse 
 		lockPeriod(
 			startDate: String!
@@ -91,6 +94,9 @@ const userType = gql`
 			signature: String
 			tempPeriodId: String
 		):RentSuccess
+		checkotp: SuccessResponse
+		confirmOtp(otp: String): SuccessResponse
+		changePassword(token:String!, newPassword:String!):SuccessResponse
   }`;
 
 module.exports = userType;

@@ -5,6 +5,8 @@ const withTransaction = require('../../../helpers/trasnsactionManger');
 const PeriodRepository = require('../../vehicle/repositories/periodRepo');
 const { v4: uuidv4 } = require('uuid'); // Use uuid for unique file names
 const bcrypt = require('bcrypt');
+const otpService = require('./../../../services/otpService')
+const jwt = require('./../../../services/jwt-servise')
 const {fetchPinCodeData} = require('../../../../utils/fetchPinCodeData')
 const paymentService = require('../../../services/paymentService');
 const calculateAmount = require('../../../helpers/calculateAmountPerPeriod');
@@ -88,48 +90,85 @@ const createUser = async ({ name, email, mobile, password, profilePic }) => {
   }
 };
 
-// Update a User (including image upload handling if necessary)
 const updateUser = async (id, updatedUserData) => {
+
   try {
-    // Handle image upload to MinIO if new images are provided
-    const { images, password } = updatedUserData;
-    console.log(images, 'images here at first')
-    if (images && images.length > 0) {
-      console.log('came inside the image')
-      const bucketExists = await minioClient.bucketExists(bucketName);
-      if (!bucketExists) {
-        console.log('came  the image')
-        await minioClient.makeBucket(bucketName, 'us-east-1');
-      }
-
-      const imageUrls = [];
-
-      for (const img of images) {
-        const imageName = uuidv4() + '.jpg';
-        const imageBuffer = Buffer.from(img.split(",")[1], 'base64');
-        await minioClient.putObject(bucketName, imageName, imageBuffer);
-        const imageUrl = `${minioClient.protocol}//192.168.10.28:9000/${bucketName}/${imageName}`;
-        imageUrls.push(imageUrl);
-        console.log(imageUrl)
-      }
-
-      updatedUserData.image = imageUrls; // Update imageUrl if new images were uploaded
+    // Destructure properties only if they exist
+    const { image: profilePicPromise, password } = updatedUserData;
+    const bucketExists = await minioClient.bucketExists(bucketName);
+    if (!bucketExists) {
+      await minioClient.makeBucket(bucketName, 'us-east-1');
     }
 
-    if(password){
+   
+    let profilePic = undefined
+    // Resolve the Promise if profilePic is a Promise
+    if (profilePicPromise instanceof Promise) {
+      profilePic = await profilePicPromise;
+    }
+
+    // Upload the profile picture to MinIO if it's provided
+    let imageUrl = null;
+    if (profilePic && typeof profilePic.createReadStream === 'function') {
+      console.log('Uploading image to MinIO...');
+
+      // Generate a unique name for the image
+      const imageName = uuidv4() + '.' + profilePic.filename.split('.').pop(); // Use the original file extension
+      const imageStream = profilePic.createReadStream();
+
+      // Upload the image stream to MinIO
+      try {
+        await minioClient.putObject(bucketName, imageName, imageStream);
+        imageUrl = `${minioClient.protocol}//${process.env.MINIO_END_POINT}:${process.env.MINIO_PORT}/${bucketName}/${imageName}`;
+        updatedUserData.profilePic = imageUrl
+        console.log('Image successfully uploaded to MinIO:', imageUrl);
+      } catch (uploadError) {
+        console.error('Error uploading image to MinIO:', uploadError);
+        throw new Error('Failed to upload image');
+      }
+    } else {
+      console.log('ProfilePic is not a valid file stream.');
+    }
+
+    if (password) {
       const salt = await bcrypt.genSalt(10); // Adjust salt rounds as necessary
       updatedUserData.password = await bcrypt.hash(password, salt);
     }
 
     // Call the repository method to update the User in the database
-    const updatedUser = await userRepository.updateUser(id, updatedUserData);
-
-    return updatedUser;
+    console.log(updatedUserData, "here the updatedUserData")
+    await userRepository.updateUser(id, updatedUserData);
+    return {success:true, message: "suucesfully updated user profile"};
   } catch (error) {
     console.error('Error updating User:', error);
     throw new Error('Failed to update User');
   }
 };
+const sentOtp = async(mobile) =>{
+  console.log(mobile, 'here ssss')
+  try {
+		const otp = otpService.generateOTP(mobile);
+		console.log(otp, "thid is otp",mobile)
+		// await twilio.sendSms(mobile, otp)
+		return {success: true, message:"Otp send Succesfully"}
+	} catch (error) {
+    	throw new Error('Error in sending OTP')
+  }
+}
+
+const verifyOtp = async(mobile, otp, userId) =>{
+  try {
+		console.log(mobile, otp, 'here the data')
+		otpService.verifyOTP(mobile, otp);
+    	const loginToken = jwt.createToken({ mobile, stage:'accessToChangePassword', userId})
+		console.log(loginToken, 'here the login token')
+		return {success: true, message:"Otp send Succesfully", token: loginToken}
+	} catch (error) {
+		console.log(error)
+		throw new Error(error)
+    // throw error
+  }
+}
 // Delete a User by ID
 const deleteUser = async (id) => {
   const isDeleted = await userRepository.deleteUser(id);
@@ -275,5 +314,7 @@ module.exports = {
   getUserPeriods,
   lockPeriod,
   createPayment,
-  rentVehicle
+  rentVehicle,
+  sentOtp,
+  verifyOtp
 };

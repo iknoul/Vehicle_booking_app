@@ -35,22 +35,42 @@ const userMutations = {
     },
     updateUser: async (_, { name, email, mobile, password, profilePic }, {user}) => {
 
-      const newUser = await userController.createUser({
+      return await userController.updateUser(user.id, {
         name,
         email,
         mobile,
         password,
-        profilePic
+        image:profilePic
       })
-      console.log('here but not @@@@@@@')
-      return newUser;
     },
     deleteUser: async (_, { id }, {user}) => {
       console.log(id)
       const result = await userController.deleteUser(id);
       return result;
     },
-    
+    checkotp: async (_, { }, {user}) => {
+      if(!user){
+        throw new Error("you are not authorized")
+      }
+      console.log(user, 'her user')
+      return await userController.sentOtp(user.mobile);
+    },
+    confirmOtp: async (_, { otp }, {user}) => {
+      return await userController.verifyOtp(user.mobile, otp, user.id);
+    },
+    changePassword: async (_, {token ,newPassword}, {user}) => {
+      try {
+        const data = jwt.verifyToken(token); // Verify the token
+        if(!data || !(data.mobile ==user.mobile) || !(data.stage === 'accessToChangePassword')){
+          throw new Error('Forbidden: Invalid token.');
+        }
+      } catch (error) {
+          console.error('Token verification failed:', error);
+          throw new Error('Forbidden: Invalid token.'); // Throw an error for invalid token
+      }
+      await userController.updateUser(user.id, {password: newPassword})
+      return {success:true, message: "password updated succesfully"}
+    },
     lockPeriod: async(_, { startDate, endDate, vehicleId }, {user}) => {
       console.log(user?.id, 'here the use id')
       const result = await userController.lockPeriod(startDate, endDate, vehicleId, user?.id);
@@ -61,6 +81,7 @@ const userMutations = {
       return await userController.createPayment(tempPeriodId, user.name, user.mobile)
     },
     verifyPayment: userController.rentVehicle
+
     
   },
 };

@@ -8,6 +8,7 @@ import PrivateRoute from '@/app/components/PrivateRouter';
 const Profile = lazy(()=>import('../components/Profile/Profile'))
 const  ProfileSideBar = lazy(()=>import('../components/ProfileSideBar/ProfileSideBar'));
 const BookingTable = lazy(()=> import('../components/BookingTable/BookingTable'))
+const ChangePasswordFlow = lazy(()=> import('../components/ChangePassword/ChangePasswordFlow'))
 
 import { Skeleton } from 'antd';
 
@@ -21,11 +22,11 @@ const pages = [
 ];
 
 const UserDashboard: React.FC = () => {
+  
   const { logout, userId } = useAuth();
   const { userProfile, loading, error, refetch } = useFetchUserProfile(userId);
-  const [isEditProfileOpen, setIsEditProfileOpen] = useState(false);
 
-  const [page, setPage] = useState<'bookings' | 'profile' | 'terms' | 'privacyPolicy'>('bookings')
+  const [page, setPage] = useState<'bookings' | 'profile' | 'changePassword' | 'terms' | 'privacyPolicy'>('bookings')
   
 
   // If the data is still loading, show a skeleton or loading message
@@ -63,6 +64,9 @@ const UserDashboard: React.FC = () => {
           {page == 'bookings' &&
             <BookingTable />
           }  
+          {page == 'changePassword' &&
+            <ChangePasswordFlow />
+          }
         </div>    
       </Suspense>  
       </div>
